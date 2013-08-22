@@ -3,7 +3,7 @@
 class CustomMenu {
   /* constants */
   const FILE = 'custom_menu';
-  const VERSION = '0.3';
+  const VERSION = '0.31';
   const AUTHOR = 'Lawrence Okoth-Odida';
   const URL = 'http://lokida.co.uk';
   const PAGE = 'pages';
@@ -239,6 +239,9 @@ class CustomMenu {
   public function getMenus() {
     $return = array();
     $menus = glob(GSDATAOTHERPATH.self::FILE.'/*.xml');
+    
+    // force $menus to be an array
+    if ($menus === false) $menus = array();
     
     foreach ($menus as $menu) {
       $tmpname = explode('/', $menu);
