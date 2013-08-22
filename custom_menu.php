@@ -11,7 +11,7 @@
   require_once(GSPLUGINPATH.$thisfile.'/php/class.php');
   
 # class instantiation
-  $custommenu = new customMenu; // instantiate class
+  $custommenu = new customMenu;
 
 # register plugin
   register_plugin(
@@ -31,7 +31,7 @@
     add_filter('content', array($custommenu, 'content'));
 
 # functions
-  function get_custom_menu($name, $min = 0, $max = 0, $template = null) {
+  function get_custom_menu($name) {
     $menu = new CustomMenuDisplay($name);
   }
  

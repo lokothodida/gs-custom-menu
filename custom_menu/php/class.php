@@ -3,7 +3,7 @@
 class CustomMenu {
   /* constants */
   const FILE = 'custom_menu';
-  const VERSION = '0.1';
+  const VERSION = '0.2';
   const AUTHOR = 'Lawrence Okoth-Odida';
   const URL = 'http://lokida.co.uk';
   const PAGE = 'pages';
@@ -142,6 +142,7 @@ class CustomMenu {
     // initialization
     $return = array();
     $nodes = array();
+    $transliteration = array('title', 'url', 'slug');
     
     foreach ($post as $key => $val) {
       if (is_array($val)) $nodes[] = $key;
@@ -153,8 +154,18 @@ class CustomMenu {
         $return[$key][$node] = $post[$node][$key];
         if ($node == 'slug') $return[$key][$node] = $this->strtoslug($post[$node][$key]);
       }
+      
+      // transliteration (lifted from changedata.php file)
+      global $i18n;
+      if (isset($i18n['TRANSLITERATION']) && is_array($translit = $i18n['TRANSLITERATION']) && count($translit > 0)) {
+        foreach ($transliteration as $trans) {
+          $return[$key][$trans] = str_replace(array_keys($translit),array_values($translit), $return[$key][$trans]);
+        }
+      } 
+      
+      // fill empty fields
       if (empty($return[$key]['slug'])) $return[$key]['slug'] = $this->strtoslug($return[$key]['title']);
-      if (empty($return[$key]['url'])) $return[$key]['url'] = $this->strtoslug($return[$key]['title']);
+      if (empty($return[$key]['url']))  $return[$key]['url'] = $this->strtoslug($return[$key]['title']);
     }
     
     // build xml file
