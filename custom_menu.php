@@ -26,6 +26,8 @@
   );
   
 # activate actions/filters
+  # front-end
+    add_action('theme-header', array($custommenu, 'themeHeader'));
   # back-end
     add_action($custommenu->info('page').'-sidebar', 'createSideMenu' , array($custommenu->info('id'), $custommenu->info('sidebar'))); // sidebar link
     add_filter('content', array($custommenu, 'content'));

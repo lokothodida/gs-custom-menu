@@ -3,7 +3,7 @@
 class CustomMenu {
   /* constants */
   const FILE = 'custom_menu';
-  const VERSION = '0.2';
+  const VERSION = '0.3';
   const AUTHOR = 'Lawrence Okoth-Odida';
   const URL = 'http://lokida.co.uk';
   const PAGE = 'pages';
@@ -18,8 +18,17 @@ class CustomMenu {
   }
   
   # string to slug (by Gilbert Pellegrom)
-  function strtoslug($string) {
-    return strtolower(trim(preg_replace('/[^A-Za-z0-9-_]+/', '-', $string)));
+  public function strtoslug($string) {
+    return strtolower(trim(preg_replace('/[^A-Za-z0-9-_]+/', '-', $this->transliterate($string))));
+  }
+  
+  # transliteration
+  public function transliterate($string) {
+    global $i18n;
+    if (isset($i18n['TRANSLITERATION']) && is_array($translit = $i18n['TRANSLITERATION']) && count($translit > 0)) {
+      $string =  str_replace(array_keys($translit), array_values($translit), $string);
+    }
+    return $string;
   }
   
   # make initial files
@@ -142,7 +151,6 @@ class CustomMenu {
     // initialization
     $return = array();
     $nodes = array();
-    $transliteration = array('title', 'url', 'slug');
     
     foreach ($post as $key => $val) {
       if (is_array($val)) $nodes[] = $key;
@@ -152,20 +160,15 @@ class CustomMenu {
     foreach ($post['level'] as $key => $level) {
       foreach ($nodes as $node) {
         $return[$key][$node] = $post[$node][$key];
-        if ($node == 'slug') $return[$key][$node] = $this->strtoslug($post[$node][$key]);
       }
-      
-      // transliteration (lifted from changedata.php file)
-      global $i18n;
-      if (isset($i18n['TRANSLITERATION']) && is_array($translit = $i18n['TRANSLITERATION']) && count($translit > 0)) {
-        foreach ($transliteration as $trans) {
-          $return[$key][$trans] = str_replace(array_keys($translit),array_values($translit), $return[$key][$trans]);
-        }
-      } 
       
       // fill empty fields
       if (empty($return[$key]['slug'])) $return[$key]['slug'] = $this->strtoslug($return[$key]['title']);
       if (empty($return[$key]['url']))  $return[$key]['url'] = $this->strtoslug($return[$key]['title']);
+      
+      // final formatting
+      $return[$key]['slug'] = $this->strtoslug($return[$key]['slug']);
+      $return[$key]['url'] =  $this->transliterate($return[$key]['url']);
     }
     
     // build xml file
@@ -254,6 +257,7 @@ class CustomMenu {
     if (isset($matches[3])) {
       foreach ($matches[3] as $key => $params) {
         $params = explode(',', $params);
+        $params = str_replace(array('\'', '"'), '', $params);
         $params = array_map('trim', $params);
         
         // evaluate boolean parameters
@@ -272,6 +276,12 @@ class CustomMenu {
       }
     }
     return $content;
+  }
+  
+  # theme header
+  public function themeHeader() {
+    global $SITEURL;
+    echo '<base href="'.$SITEURL.'">';
   }
   
   # admin
