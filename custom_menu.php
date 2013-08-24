@@ -29,12 +29,15 @@
   # front-end
     add_action('theme-header', array($custommenu, 'themeHeader'));
   # back-end
+    if (isset($_GET['id']) && $_GET['id'] == customMenu::FILE) {
+      add_action('header', array($custommenu, 'header'));
+    }
     add_action($custommenu->info('page').'-sidebar', 'createSideMenu' , array($custommenu->info('id'), $custommenu->info('sidebar'))); // sidebar link
     add_filter('content', array($custommenu, 'content'));
 
 # functions
-  function get_custom_menu($name) {
-    $menu = new CustomMenuDisplay($name);
+  function get_custom_menu($name, $classes=array()) {
+    $menu = new CustomMenuDisplay($name, $classes);
   }
  
 ?>

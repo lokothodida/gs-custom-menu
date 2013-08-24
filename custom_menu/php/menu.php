@@ -1,7 +1,12 @@
-<h3><?php echo i18n_r(self::FILE.'/PLUGIN_NAME'); ?></h3>
+<h3><?php echo i18n_r(self::FILE.'/MENU'); ?></h3>
 
 <style>
   .advanced { display: none; }
+  #tabs .edit-nav a:hover { color: <?php global $secondary_1; echo $secondary_1; ?>; }
+  #tabs ul, #about li { margin: 0; padding: 0; list-style-type: none; }
+  #tabs > div { margin: -20px 0 0 0; }
+  #tabs .clear { height: 15px; }
+  .CodeMirror, .CodeMirror-scroll { height: 200px; }
 </style>
 
 <script>
@@ -49,30 +54,37 @@
       }
       return false;
     });
+    
+    // tabs
+    $('#tabs').easytabs();
   }); // ready
 </script>
 
 <form method="post" action="<?php echo $url; ?>">
-  <p>
-    <input type="hidden" name="oldname" value="<?php echo $_GET['menu']; ?>">
-    <input type="text" class="text" style="width: 150px;" name="name" placeholder="<?php echo i18n_r(self::FILE.'/NAME'); ?>" required value="<?php echo $_GET['menu']; ?>">
-    <a href="#" class="cancel add">+ <?php echo i18n_r(self::FILE.'/ITEM'); ?></a>
-  </p>
-  <div class="items">
-    <?php
-      $items = $this->getItems($_GET['menu']);
-      foreach ($items as $item) {
-        $this->adminItem($item);
-      }
-      if (empty($items)) {
-        $this->adminItem(array());
-      }
-    ?>
+  <div>
+    <p>
+      <input type="hidden" name="oldname" value="<?php if (isset($_GET['menu'])) echo $_GET['menu']; ?>">
+      <input type="text" class="text" style="width: 150px;" name="name" placeholder="<?php echo i18n_r(self::FILE.'/NAME'); ?>" required value="<?php if (isset($_GET['menu'])) echo $_GET['menu']; ?>">
+      <a href="#" class="cancel add">+ <?php echo i18n_r(self::FILE.'/ITEM'); ?></a>
+    </p>
+    <div class="items">
+      <?php
+        $items = isset($_GET['menu']) ? $this->getItems($_GET['menu']) : array();
+        foreach ($items as $item) {
+          $this->adminItem($item);
+        }
+        if (empty($items)) {
+          $this->adminItem(array());
+        }
+      ?>
+    </div>
+    <p>
+      <a href="#" class="cancel add">+ <?php echo i18n_r(self::FILE.'/ITEM'); ?></a>
+    </p>
   </div>
-    <div style="overflow: hidden;">
-      <input type="submit" class="submit" name="saveMenu" value="<?php echo i18n_r('BTN_SAVECHANGES'); ?>" onclick="return confirm('<?php echo i18n_r(self::FILE.'/ARE_YOU_SURE'); ?>');">&nbsp;&nbsp;/
-      <a href="<?php echo $url; ?>" class="cancel"><?php echo i18n_r(self::FILE.'/BACK'); ?></a>
-      <a href="#" class="cancel add" style="float: right;">+ <?php echo i18n_r(self::FILE.'/ITEM'); ?></a>
+    
+  <div style="margin-top: 10px;">
+    <input type="submit" class="submit" <?php echo (isset($_GET['menu'])) ? 'name="saveMenu"' : 'name="createMenu"'; ?> value="<?php echo i18n_r('BTN_SAVECHANGES'); ?>" onclick="return confirm('<?php echo i18n_r(self::FILE.'/ARE_YOU_SURE'); ?>');">&nbsp;&nbsp;/
+    <a href="<?php echo $url; ?>" class="cancel"><?php echo i18n_r(self::FILE.'/BACK'); ?></a>
   </div>
-
 </form>

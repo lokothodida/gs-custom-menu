@@ -3,7 +3,7 @@
 class CustomMenu {
   /* constants */
   const FILE = 'custom_menu';
-  const VERSION = '0.31';
+  const VERSION = '0.4';
   const AUTHOR = 'Lawrence Okoth-Odida';
   const URL = 'http://lokida.co.uk';
   const PAGE = 'pages';
@@ -39,7 +39,12 @@ class CustomMenu {
     // paths
     foreach ($paths as $path) {
       if (!file_exists(GSDATAOTHERPATH.$path)) {
-        $return[$path] = mkdir(GSDATAOTHERPATH.$path, '0755');
+        $return[$path][] = mkdir(GSDATAOTHERPATH.$path, '0755');
+        
+        // writeable permissions final check
+        if (!is_writable (GSDATAOTHERPATH.$path)) {
+          $return[$path][] = chmod(GSDATAOTHERPATH.$path, 0755);
+        }
       }
     }
     
@@ -172,18 +177,23 @@ class CustomMenu {
     }
     
     // build xml file
-    $xml = new SimpleXMLExtended('<menu/>');
+    $xml = new SimpleXMLExtended('<?xml version="1.0" encoding="UTF-8"?><channel/>');
     $cdata = array('title', 'url');
+    // menu items
+    $menu = $xml->addChild('menu');
     foreach ($return as $key => $item) {
-      $node = $xml->addChild('item');
+      $itemxml = $menu->addChild('item');
       foreach ($item as $field => $val) {
         if (in_array($field, $cdata)) {
-          $node->{$field} = null;
-          $node->{$field}->addCData($val);
+          $itemxml->{$field} = null;
+          $itemxml->{$field}->addCData($val);
         }
-        else $node->addChild($field, $val);
+        else $itemxml->addChild($field, $val);
       }
     }
+    
+    // settings
+    $settings = $xml->addChild('settings');
 
     // format the xml file (beautify)
     $dom = new DOMDocument;
@@ -227,9 +237,21 @@ class CustomMenu {
       $items = simplexml_load_file($file, 'SimpleXMLElement', LIBXML_NOCDATA); // thanks to http://blog.evandavey.com/2008/04/how-to-fix-simplexml-cdata-problem-in-php.html
       $items = json_decode(json_encode($items), true);
       
+      // move channel node
+      if (isset($items['menu'])) {
+        $items = $items['menu'];
+      }
+      
+      // old format
       if (isset($items['item']['title'])) {
         $items = array('item' => array($items['item']));
       }
+      
+      // new format
+      if (isset($items['channel']['item']['title'])) {
+        $items = array('item' => array($items['channel']['item']));
+      }
+      
       return $items['item'];
     }
     else return array();
@@ -281,6 +303,13 @@ class CustomMenu {
     return $content;
   }
   
+  # header (for codemirror)
+  public function header() {
+    global $SITEURL;
+    echo '<link href="'.$SITEURL.'admin/template/js/codemirror/lib/codemirror.css?v=screen" rel="stylesheet" media=""><link href="'.$SITEURL.'admin/template/js/codemirror/theme/default.css?v=screen" rel="stylesheet" media="">';
+    echo '<script src="'.$SITEURL.'admin/template/js/fancybox/jquery.fancybox.pack.js?v=2.0.4"></script><script src="'.$SITEURL.'admin/template/js/codemirror/lib/codemirror-compressed.js?v=0.2.0"></script>';
+  }
+  
   # theme header
   public function themeHeader() {
     global $SITEURL;
@@ -327,7 +356,7 @@ class CustomMenu {
     
     // create new menu
     if (isset($_GET['create'])) {
-      include($path.'create.php');
+      include($path.'menu.php');
     }
     // edit a menu
     elseif (isset($_GET['menu'])) {
@@ -341,52 +370,130 @@ class CustomMenu {
 }
 
 class CustomMenuDisplay {
-  // huge credit to http://www.jongales.com/blog/2009/01/27/php-class-for-threaded-comments/, which this script is based on
+  # huge credit to http://www.jongales.com/blog/2009/01/27/php-class-for-threaded-comments/, which this script is based on
   private $menu;
   private $parents;
   private $children;
+  private $url = array();
+  private $classes = array();
   
-  public function __construct($menu) {
+  public function __construct($menu, $classes=array()) {
     $custommenu = new CustomMenu;
+    
+    if (!isset($classes['currentpath'])) $classes['currentpath'] = 'currentpath';
+    if (!isset($classes['current'])) $classes['current'] = 'current';
+    if (!isset($classes['parent'])) $classes['parent'] = 'parent';
+    if (!isset($classes['child'])) $classes['child'] = 'child';
+    
+    $this->classes = $classes;
     $this->menu = $custommenu->getItems($menu);
     $this->parse();
     $this->displayMenu();
   }
   
+  # get the full current url (http://www.phpro.org/examples/Get-Full-URL.html)
+  public function currentURL($path=true) {
+    $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http';
+    return trim($protocol.'://'.$_SERVER['HTTP_HOST'].($path ? $_SERVER['REQUEST_URI'] : ''));
+  }
+  
+  # parse the url
+  public function url() {
+    $url = $this->currentURL();
+    $url = explode('/', $url);
+    $url = array_map('trim', $url);
+    
+    return $url;
+  }
+  
   # parses structure into nested list
   private function parse() {
+    global $id, $SITEURL;
     $return = array();
     $parent = null;
     $level = 0;
     $prev = null;
     $current = array();
+    $currentItem = null;
+    $currentURL = rtrim($this->currentURL(), '/').'/';
+    
     foreach ($this->menu as $key => $item) {
       $current[$item['level']] = $item['slug'];
       
+      // set parent id
       if (isset($current[$item['level'] - 1])) {
         $item['parent'] = $current[$item['level'] - 1];
       }
       else {
         $item['parent'] = null;
       }
+            
+      // check if site url is already part of url
+      if (strpos($item['url'], $SITEURL === 0)) {
+        $fullurl = $item['url'];
+      }
+      else $fullurl = $SITEURL.$item['url'];
+      
+      $fullurl = rtrim($fullurl, '/').'/';
+      
+      // now check if this item is currently active
+      if ((strpos($currentURL, $fullurl) === 0) && trim($item['slug']) == $id) {
+        $currentItem = $item;
+      }
       
       $this->menu[$key] = $item;
     }
     
+    // pull apart array into children/parents arrays
     foreach ($this->menu as $menu)  {  
-      if ($menu['parent'] === NULL)  {  
+      if (empty($menu['parent']))  {  
         $this->parents[$menu['slug']][] = $menu;  
       }  
       else {  
         $this->children[$menu['parent']][] = $menu;  
       }  
-    } 
+    }
+    
+    // current item
+    if ($currentItem) {
+      $this->addClasses($currentItem['parent']);
+    }
+  }
+  
+  // add currentpath classes
+  private function addClasses($slug) {
+    // load correct array
+    if (!empty($this->parents[$slug])) {
+      $title = 'parents';
+      $array = $this->parents;
+    }
+    elseif (!empty($this->children[$slug])) {
+      $title = 'children';
+      $array = $this->children;
+    }
+    else {
+      $title = null;
+      $array = array();
+      return false;
+    }
+    
+    // add the class(es)
+    foreach ($array as $name => $child) {
+      foreach ($child as $key => $item) {
+        if ($item['slug'] == $slug) {
+          $this->{$title}[$name][$key]['classes'][] = $this->classes['currentpath'];
+          $this->addClasses($item['parent']);
+          break;
+        }
+      }
+    }
   }
   
   private function formatItem($item, $depth) {
     if ($item['url'] == 'index') $item['url'] = '';
+    $item = json_decode(json_encode($item), false);
     ?>
-    <a href="<?php echo $item['url']; ?>" target="<?php echo $item['target']; ?>"><?php echo $item['title']; ?></a>
+    <a href="<?php echo $item->url; ?>" target="<?php echo $item->target; ?>"><?php echo $item->title; ?></a>
     <?php
   }  
   
@@ -394,9 +501,17 @@ class CustomMenuDisplay {
   private function displayItem($items, $depth = 0) {
     global $id;
     foreach ($items as $item)   {
-      $classes = array();
+      if (empty($item['classes'])) $item['classes'] = array();
+      $classes = $item['classes'];
       $classes[] = is_string($item['slug']) ? $item['slug'] : '';
-      if ($id == $item['slug']) $classes[] = 'current';
+      if ($id == $item['slug']) $classes[] = $this->classes['current'];
+      if (isset($this->children[$item['slug']])) {
+        $classes[] = $this->classes['parent'];
+      }
+      else {
+        $classes[] = $this->classes['child'];
+      }
+      
       $classes = implode(' ', $classes);
       
       echo '<li class="'.$classes.'">';
@@ -413,6 +528,7 @@ class CustomMenuDisplay {
   
   # final output
   public function displayMenu() {
+    $this->url = $this->url();
     if (is_array($this->parents)) {
       foreach ($this->parents as $parent) {  
         $this->displayItem($parent);  
