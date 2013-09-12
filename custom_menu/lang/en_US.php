@@ -17,6 +17,7 @@ $i18n = array(
     'ITEM' => 'Item',
     'ITEMS' => 'Items',
     'NODE' => 'Node',
+    'IMAGE' => 'Image',
     'CLASS_CURRENTPATH' => '"Current Path" Class',
     'CLASS_CURRENT' => '"Current" Class',
     'CREATE' => 'Create',

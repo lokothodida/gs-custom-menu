@@ -12,6 +12,7 @@ $i18n = array(
   , 'ITEM' => "Stück"
   , 'ITEMS' => "Artikel"
   , 'NODE' => "Knoten"
+  , 'IMAGE' => "Bild"
   , 'CREATE' => "Schaffen"
   , 'ARE_YOU_SURE' => "Sind Sie sicher, dass Sie dieses Menü speichern möchten?"
   , 'MENU_CREATE_SUCCESS' => "Menü erfolgreich erstellt"

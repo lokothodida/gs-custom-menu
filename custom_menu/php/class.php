@@ -3,7 +3,7 @@
 class CustomMenu {
   /* constants */
   const FILE = 'custom_menu';
-  const VERSION = '0.4';
+  const VERSION = '0.5';
   const AUTHOR = 'Lawrence Okoth-Odida';
   const URL = 'http://lokida.co.uk';
   const PAGE = 'pages';
@@ -87,11 +87,19 @@ class CustomMenu {
     if (!isset($item['slug'])) $item['slug'] = '';
     if (!isset($item['level'])) $item['level'] = 0;
     if (!isset($item['target'])) $item['target'] = '_self';
+    if (!isset($item['img'])) $item['img'] = null;
     
     
     // prevents array to string conversion problem
     foreach ($item as $node => $val) {
       if (is_array($val)) $item[$node] = '';
+    }
+    
+    // load pages array
+    $pages = glob(GSDATAPAGESPATH.'*.xml');
+    $slugs = array();
+    foreach ($pages as $page) {
+      $slugs[] = trim(str_replace(array(GSDATAPAGESPATH, '.xml'), '', $page));
     }
     
     ob_start();
@@ -121,7 +129,13 @@ class CustomMenu {
           </p>
           <p>
             <label><?php echo i18n_r(self::FILE.'/SLUG'); ?></label>
-            <input type="text" class="text" name="slug[]" value="<?php echo $item['slug']; ?>">   
+            <select class="text slugDropdown" name="slug[]">
+              <option value="">----</option>
+              <?php foreach ($slugs as $slug) { ?>
+                <option value="<?php echo $slug; ?>" <?php if ($slug && $slug == $item['slug']) echo 'selected="selected"'; ?>><?php echo $slug; ?></option>
+              <?php } ?>
+            </select>
+            <input type="text" class="text slugText" style="margin-top: 5px !important;" value="<?php echo $item['slug']; ?>">   
           </p>
         </div>
         <div class="rightopt">
@@ -133,6 +147,10 @@ class CustomMenu {
               <option <?php if ($item['target'] == '_parent') echo 'selected="selected"'; ?>>_parent</option>
               <option <?php if ($item['target'] == '_top') echo 'selected="selected"'; ?>>_top</option>
             </select>
+          </p>
+          <p>
+            <label><?php echo i18n_r(self::FILE.'/IMAGE'); ?></label>
+            <input type="text" class="text" name="img[]" value="<?php echo $item['img']; ?>">   
           </p>
           <div class="nodes">
           </div>
@@ -154,8 +172,7 @@ class CustomMenu {
   # parses menu structure from POST values
   private function saveMenu($post) {
     // initialization
-    $return = array();
-    $nodes = array();
+    $return = $nodes = $saved = array();
     
     foreach ($post as $key => $val) {
       if (is_array($val)) $nodes[] = $key;
@@ -169,11 +186,18 @@ class CustomMenu {
       
       // fill empty fields
       if (empty($return[$key]['slug'])) $return[$key]['slug'] = $this->strtoslug($return[$key]['title']);
-      if (empty($return[$key]['url']))  $return[$key]['url'] = $this->strtoslug($return[$key]['title']);
       
       // final formatting
       $return[$key]['slug'] = $this->strtoslug($return[$key]['slug']);
       $return[$key]['url'] =  $this->transliterate($return[$key]['url']);
+      
+      // checks to see slug doesn't already exist
+      if (in_array($return[$key]['slug'], $saved)) {
+        $return[$key]['slug'] = $return[$key]['slug'].'-'.rand(0, 100);
+      }
+      
+      // add to saved array
+      $saved[] = $return[$key]['slug'];
     }
     
     // build xml file
@@ -429,10 +453,13 @@ class CustomMenuDisplay {
       }
             
       // check if site url is already part of url
-      if (strpos($item['url'], $SITEURL === 0)) {
-        $fullurl = $item['url'];
+      $fullurl = null;
+      if (is_string($item['url'])) {
+        if (strpos($item['url'], $SITEURL === 0)) {
+          $fullurl = $item['url'];
+        }
+        else $fullurl = $SITEURL.$item['url'];
       }
-      else $fullurl = $SITEURL.$item['url'];
       
       $fullurl = rtrim($fullurl, '/').'/';
       
@@ -490,10 +517,17 @@ class CustomMenuDisplay {
   }
   
   private function formatItem($item, $depth) {
+    global $SITEURL;
     if ($item['url'] == 'index') $item['url'] = '';
     $item = json_decode(json_encode($item), false);
     ?>
-    <a href="<?php echo $item->url; ?>" target="<?php echo $item->target; ?>"><?php echo $item->title; ?></a>
+    <?php if ($item->url) { ?><a href="<?php echo $item->url; ?>" title="<?php echo $item->title; ?>" target="<?php echo $item->target; ?>"><?php } ?>
+      <?php if ($item->img) { ?>
+      <img alt="<?php echo $item->title; ?>" src="<?php echo (strpos($item->img, 'http') === false ? $SITEURL.'data/uploads/' : '').$item->img; ?>">
+      <?php } else { ?>
+      <?php echo $item->title; ?>
+      <?php } ?>
+    <?php if ($item->url) { ?></a><?php } ?>
     <?php
   }  
   

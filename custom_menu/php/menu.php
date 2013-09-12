@@ -55,6 +55,22 @@
       return false;
     });
     
+    // show/hide slug dropdown
+    $(document).on('change', '.slugDropdown',function(e){
+      var value = $(this).val();
+      var $this = $(this);
+      if (value == '') {
+        $(this).next('.slugText').attr('name', 'slug[]').show();
+        $this.removeAttr('name');
+      }
+      else {
+        $(this).next('.slugText').removeAttr('name').hide();
+        $this.attr('name', 'slug[]').show();
+      }
+      return false;
+    });
+    $('.slugDropdown').trigger('change');
+    
     // tabs
     $('#tabs').easytabs();
   }); // ready
