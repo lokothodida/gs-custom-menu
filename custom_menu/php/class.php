@@ -5,7 +5,7 @@ class CustomMenu {
   const FILE = 'custom_menu';
   const VERSION = '0.5';
   const AUTHOR = 'Lawrence Okoth-Odida';
-  const URL = 'http://lokida.co.uk';
+  const URL = 'http://github.com/lokothodida';
   const PAGE = 'pages';
   
   /* properties */
@@ -38,12 +38,14 @@ class CustomMenu {
     
     // paths
     foreach ($paths as $path) {
-      if (!file_exists(GSDATAOTHERPATH.$path)) {
-        $return[$path][] = mkdir(GSDATAOTHERPATH.$path, '0755');
-        
+      $fullPath = GSDATAOTHERPATH . $path;
+
+      if (!file_exists($fullPath)) {
+        $return[$path][] = mkdir($fullPath, 0755);
+
         // writeable permissions final check
-        if (!is_writable (GSDATAOTHERPATH.$path)) {
-          $return[$path][] = chmod(GSDATAOTHERPATH.$path, 0755);
+        if (!is_writable ($fullPath)) {
+          $return[$path][] = chmod($fullPath, 0755);
         }
       }
     }
