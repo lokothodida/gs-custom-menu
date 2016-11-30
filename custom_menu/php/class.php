@@ -3,7 +3,7 @@
 class CustomMenu {
   /* constants */
   const FILE = 'custom_menu';
-  const VERSION = '0.6';
+  const VERSION = '0.6.1';
   const AUTHOR = 'Lawrence Okoth-Odida';
   const URL = 'http://github.com/lokothodida';
   const PAGE = 'pages';
