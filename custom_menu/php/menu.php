@@ -45,7 +45,7 @@
     });
 
     // Open the advanced settings for an item
-    $document.on('click', '.open', function(evt) {
+    $document.on("click", ".open", function(evt) {
       var $item = getClosestItem(evt.target);
       $item.find('.advanced').slideToggle();
 
@@ -53,28 +53,32 @@
     });
 
     // Increase an item's indentation level
-    $document.on('click', '.indent', function(e) {
-      var selector = $(this).closest('div').find('.level');
-      var val = parseInt(selector.val()) + 1;
-      var prevVal = parseInt($(this).closest('div').prev().find('.level').val());
+    $document.on("click", ".indent", function(evt) {
+      var $item    = getClosestItem(evt.target);
+      var selector = $item.find('.level');
+      var val      = parseInt(selector.val()) + 1;
+      var prevVal  = parseInt($item.prev().find('.level').val());
 
       if ((val - prevVal) <= 1) {
         selector.val(val);
-        $(this).closest('div').css('margin-left', val * 20);
+        $item.css('margin-left', val * 20);
       }
 
-      return false;
+      evt.preventDefault();
     });
 
     // Decrease an item's indentation level
-    $document.on('click', '.undent', function(e) {
-      var selector = $(this).closest('div').find('.level');
-      var val = parseInt(selector.val()) - 1;
+    $document.on("click", ".undent", function(evt) {
+      var $item    = getClosestItem(evt.target);
+      var selector = $item.find('.level');
+      var val      = parseInt(selector.val()) - 1;
+
       if (val >= 0) {
         selector.val(val);
-        $(this).closest('div').css('margin-left', val * 20);
+        $item.css('margin-left', val * 20);
       }
-      return false;
+
+      evt.preventDefault();
     });
 
     // Hide the slug dropdown if the value selected is empty
