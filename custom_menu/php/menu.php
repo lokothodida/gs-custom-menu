@@ -2,25 +2,21 @@
 
 <style>
   .advanced { display: none; }
-  #tabs .edit-nav a:hover { color: <?php global $secondary_1; echo $secondary_1; ?>; }
-  #tabs ul, #about li { margin: 0; padding: 0; list-style-type: none; }
-  #tabs > div { margin: -20px 0 0 0; }
-  #tabs .clear { height: 15px; }
-  .CodeMirror, .CodeMirror-scroll { height: 200px; }
 </style>
 
 <script>
-  $(document).ready(function() {
+  jQuery(function($) {
     // Cache document and items
     var $document = $(document);
     var $items = $("form .items");
+    var itemTemplate = <?php echo json_encode($this->adminItem(array(), false)); ?>;
 
     // sortable
     $items.sortable();
 
     // add item
     $('.add').click(function() {
-      $items.append(<?php echo json_encode($this->adminItem(array(), false)); ?>);
+      $items.append(itemTemplate);
       return false;
     }); // click
 
@@ -74,9 +70,6 @@
       return false;
     });
     $('.slugDropdown').trigger('change');
-
-    // tabs
-    $('#tabs').easytabs();
   }); // ready
 </script>
 
