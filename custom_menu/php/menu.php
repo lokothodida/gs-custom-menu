@@ -21,6 +21,10 @@
     var $items       = $("form .items");
     var itemTemplate = getTemplate("admin-menu-item");
 
+    function getClosestItem(elem) {
+      return $(elem).closest(".item");
+    }
+
     // Make each ".item" element sortable
     $items.sortable();
 
@@ -34,17 +38,18 @@
 
     // Remove an item from the items list
     $document.on("click", ".delete", function(evt) {
-      var $elem = $(evt.target);
-      var $item = $elem.closest(".item");
+      var $item = getClosestItem(evt.target);
       $item.remove();
 
       evt.preventDefault();
     });
 
     // Open the advanced settings for an item
-    $document.on('click', '.open', function(e) {
-      $(this).closest('div').find('.advanced').slideToggle();
-      return false;
+    $document.on('click', '.open', function(evt) {
+      var $item = getClosestItem(evt.target);
+      $item.find('.advanced').slideToggle();
+
+      evt.preventDefault();
     });
 
     // Increase an item's indentation level
@@ -52,10 +57,12 @@
       var selector = $(this).closest('div').find('.level');
       var val = parseInt(selector.val()) + 1;
       var prevVal = parseInt($(this).closest('div').prev().find('.level').val());
+
       if ((val - prevVal) <= 1) {
         selector.val(val);
         $(this).closest('div').css('margin-left', val * 20);
       }
+
       return false;
     });
 
