@@ -41,6 +41,31 @@
         this.$elem.css("margin-left", level * 20);
       }
 
+      // Get the dropdown
+      getSlugDropdown() {
+        return this.$elem.find(".slugDropdown");
+      }
+
+      // Get slug dropdown
+      getSlug() {
+        return this.getSlugDropdown().val();
+      }
+
+      // Set slug dropdown
+      setSlug(value) {
+        var $dropdown = this.getSlugDropdown();
+
+        if (value == '') {
+          // The .slugText element should have its value sent to the POST slug[] array
+          $dropdown.next('.slugText').attr('name', 'slug[]').show();
+          $dropdown.removeAttr('name');
+        } else {
+          // The dropdown's value show be sent to the POST slug[] array
+          $dropdown.next('.slugText').removeAttr('name').hide();
+          $dropdown.attr('name', 'slug[]').show();
+        }
+      }
+
       // Get the closest item to the current elemtn
       static closest(elem) {
         return $(elem).closest(".item");
@@ -111,18 +136,11 @@
     }
 
     function toggleItemSlugDropdown(evt) {
-      var $dropdown = $(evt.target);
-      var value = $dropdown.val();
+      var $item = Item.closest(evt.target);
+      var item  = $item.data("item");
+      var value = item.getSlug();
 
-      if (value == '') {
-        // The .slugText element should have its value sent to the POST slug[] array
-        $dropdown.next('.slugText').attr('name', 'slug[]').show();
-        $dropdown.removeAttr('name');
-      } else {
-        // The dropdown's value show be sent to the POST slug[] array
-        $dropdown.next('.slugText').removeAttr('name').hide();
-        $dropdown.attr('name', 'slug[]').show();
-      }
+      item.setSlug(value);
 
       evt.preventDefault();
     }
