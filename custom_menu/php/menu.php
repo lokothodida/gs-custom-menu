@@ -11,29 +11,33 @@
 
 <script>
   $(document).ready(function() {
+    // Cache document and items
+    var $document = $(document);
+    var $items = $("form .items");
+
     // sortable
-    $('form .items').sortable();
-   
+    $items.sortable();
+
     // add item
     $('.add').click(function() {
-      $('form .items').append(<?php echo json_encode($this->adminItem(array(), false)); ?>);
+      $items.append(<?php echo json_encode($this->adminItem(array(), false)); ?>);
       return false;
     }); // click
-    
+
     // delete item
-    $(document).on('click', '.delete', function(e){
+    $document.on('click', '.delete', function(e){
       $(this).closest('div').remove();
       return false;
     });
-    
+
     // open advanced
-    $(document).on('click', '.open',function(e){
+    $document.on('click', '.open',function(e){
       $(this).closest('div').find('.advanced').slideToggle();
       return false;
     });
-    
+
     // add level
-    $(document).on('click', '.indent',function(e){
+    $document.on('click', '.indent',function(e){
       var selector = $(this).closest('div').find('.level');
       var val = parseInt(selector.val()) + 1;
       var prevVal = parseInt($(this).closest('div').prev().find('.level').val());
@@ -43,9 +47,9 @@
       }
       return false;
     });
-    
+
     // decrease level
-    $(document).on('click', '.undent',function(e){
+    $document.on('click', '.undent',function(e){
       var selector = $(this).closest('div').find('.level');
       var val = parseInt(selector.val()) - 1;
       if (val >= 0) {
@@ -54,9 +58,9 @@
       }
       return false;
     });
-    
+
     // show/hide slug dropdown
-    $(document).on('change', '.slugDropdown',function(e){
+    $document.on('change', '.slugDropdown',function(e){
       var value = $(this).val();
       var $this = $(this);
       if (value == '') {
@@ -70,7 +74,7 @@
       return false;
     });
     $('.slugDropdown').trigger('change');
-    
+
     // tabs
     $('#tabs').easytabs();
   }); // ready
@@ -98,7 +102,7 @@
       <a href="#" class="cancel add">+ <?php echo i18n_r(self::FILE.'/ITEM'); ?></a>
     </p>
   </div>
-    
+
   <div style="margin-top: 10px;">
     <input type="submit" class="submit" <?php echo (isset($_GET['menu'])) ? 'name="saveMenu"' : 'name="createMenu"'; ?> value="<?php echo i18n_r('BTN_SAVECHANGES'); ?>" onclick="return confirm('<?php echo i18n_r(self::FILE.'/ARE_YOU_SURE'); ?>');">&nbsp;&nbsp;/
     <a href="<?php echo $url; ?>" class="cancel"><?php echo i18n_r(self::FILE.'/BACK'); ?></a>
