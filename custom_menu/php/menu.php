@@ -32,7 +32,7 @@
       // Get the current level
       getLevel() {
         var level = this.$elem.find(".level").val();
-        return parseInt(level);
+        return parseInt(level, 10);
       }
 
       // Set the current level
