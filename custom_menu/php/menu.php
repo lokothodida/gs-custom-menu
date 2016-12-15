@@ -7,33 +7,33 @@
 <script>
   jQuery(function($) {
     // Cache document and items
-    var $document = $(document);
-    var $items = $("form .items");
+    var $document    = $(document);
+    var $items       = $("form .items");
     var itemTemplate = <?php echo json_encode($this->adminItem(array(), false)); ?>;
 
-    // sortable
+    // Make each ".item" element sortable
     $items.sortable();
 
-    // add item
+    // Inject a new item to the items list
     $('.add').click(function() {
       $items.append(itemTemplate);
       return false;
     }); // click
 
-    // delete item
-    $document.on('click', '.delete', function(e){
+    // Remove an item from the items list
+    $document.on('click', '.delete', function(e) {
       $(this).closest('div').remove();
       return false;
     });
 
-    // open advanced
-    $document.on('click', '.open',function(e){
+    // Open the advanced settings for an item
+    $document.on('click', '.open', function(e) {
       $(this).closest('div').find('.advanced').slideToggle();
       return false;
     });
 
-    // add level
-    $document.on('click', '.indent',function(e){
+    // Increase an item's indentation level
+    $document.on('click', '.indent', function(e) {
       var selector = $(this).closest('div').find('.level');
       var val = parseInt(selector.val()) + 1;
       var prevVal = parseInt($(this).closest('div').prev().find('.level').val());
@@ -44,8 +44,8 @@
       return false;
     });
 
-    // decrease level
-    $document.on('click', '.undent',function(e){
+    // Decrease an item's indentation level
+    $document.on('click', '.undent', function(e) {
       var selector = $(this).closest('div').find('.level');
       var val = parseInt(selector.val()) - 1;
       if (val >= 0) {
@@ -55,20 +55,25 @@
       return false;
     });
 
-    // show/hide slug dropdown
-    $document.on('change', '.slugDropdown',function(e){
+    // Hide the slug dropdown if the value selected is empty
+    $document.on('change', '.slugDropdown', function(e) {
       var value = $(this).val();
       var $this = $(this);
+
       if (value == '') {
+        // The .slugText element should have its value sent to the POST slug[] array
         $(this).next('.slugText').attr('name', 'slug[]').show();
         $this.removeAttr('name');
-      }
-      else {
+      } else {
+        // The dropdown's value show be sent to the POST slug[] array
         $(this).next('.slugText').removeAttr('name').hide();
         $this.attr('name', 'slug[]').show();
       }
+
       return false;
     });
+
+    // Force all of the empty slug dropdowns to be hidden
     $('.slugDropdown').trigger('change');
   }); // ready
 </script>
