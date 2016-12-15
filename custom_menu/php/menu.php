@@ -25,16 +25,20 @@
     $items.sortable();
 
     // Inject a new item to the items list
-    $('.add').click(function() {
+    $('.add').click(function(evt) {
       var template = getTemplate("admin-menu-item");
       $items.append(template);
-      return false;
-    }); // click
+
+      evt.preventDefault();
+    });
 
     // Remove an item from the items list
-    $document.on('click', '.delete', function(e) {
-      $(this).closest('div').remove();
-      return false;
+    $document.on("click", ".delete", function(evt) {
+      var $elem = $(evt.target);
+      var $item = $elem.closest(".item");
+      $item.remove();
+
+      evt.preventDefault();
     });
 
     // Open the advanced settings for an item
