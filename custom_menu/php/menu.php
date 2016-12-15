@@ -19,7 +19,7 @@
     // Cache document and items
     var $document    = $(document);
     var $items       = $("form .items");
-    var itemTemplate = getTemplate("admin-menu-template").html();
+    var itemTemplate = getTemplate("admin-menu-item").html();
 
     // Make each ".item" element sortable
     $items.sortable();
