@@ -5,14 +5,17 @@
 </style>
 
 <script>
-  $(document).ready(function() {
-    $('a.create').hide();
-    $('input.create').show();
-    $('input.create').click(function() {
-      window.location.href = $('a.create').attr('href');
-      return false;
-    }); // click
-  }); // ready
+/* global jQuery */
+jQuery.ready(function($) {
+  // Force the input button to be an anchor to the creation page
+  $('a.create').hide();
+  $('input.create').show();
+  $('input.create').click(function(evt) {
+    window.location.href = $('a.create').attr('href');
+
+    evt.preventDefault();
+  });
+});
 </script>
 
 <table class="highlight edittable">
