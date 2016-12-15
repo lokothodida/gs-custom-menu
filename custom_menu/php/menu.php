@@ -13,20 +13,21 @@
   jQuery(function($) {
     // Get a template (by name attribute)
     function getTemplate(name) {
-      return $("template[name='" + name + "']");
+      return $($("template[name='" + name + "']").html());
     }
 
     // Cache document and items
     var $document    = $(document);
     var $items       = $("form .items");
-    var itemTemplate = getTemplate("admin-menu-item").html();
+    var itemTemplate = getTemplate("admin-menu-item");
 
     // Make each ".item" element sortable
     $items.sortable();
 
     // Inject a new item to the items list
     $('.add').click(function() {
-      $items.append(itemTemplate);
+      var template = getTemplate("admin-menu-item");
+      $items.append(template);
       return false;
     }); // click
 
