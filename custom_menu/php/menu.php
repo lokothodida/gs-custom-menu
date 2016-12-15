@@ -1,15 +1,25 @@
 <h3><?php echo i18n_r(self::FILE.'/MENU'); ?></h3>
 
+<template name="admin-menu-item">
+  <?php $this->adminItem(array()); ?>
+</template>
+
 <style>
   .advanced { display: none; }
 </style>
 
 <script>
+  /* global jQuery */
   jQuery(function($) {
+    // Get a template (by name attribute)
+    function getTemplate(name) {
+      return $("template[name='" + name + "']");
+    }
+
     // Cache document and items
     var $document    = $(document);
     var $items       = $("form .items");
-    var itemTemplate = <?php echo json_encode($this->adminItem(array(), false)); ?>;
+    var itemTemplate = getTemplate("admin-menu-template").html();
 
     // Make each ".item" element sortable
     $items.sortable();
