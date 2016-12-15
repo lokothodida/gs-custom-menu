@@ -195,9 +195,11 @@ class CustomMenu {
       $return[$key]['url'] =  $this->transliterate($return[$key]['url']);
 
       // checks to see slug doesn't already exist
+      /*
       if (in_array($return[$key]['slug'], $saved)) {
         $return[$key]['slug'] = $return[$key]['slug'].'-'.rand(0, 100);
       }
+      */
 
       // add to saved array
       $saved[] = $return[$key]['slug'];
