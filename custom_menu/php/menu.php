@@ -1,9 +1,5 @@
 <h3><?php echo i18n_r(self::FILE.'/MENU'); ?></h3>
 
-<template name="admin-menu-item">
-  <?php $this->adminItem(array()); ?>
-</template>
-
 <style>
   .advanced { display: none; }
 </style>
@@ -11,16 +7,16 @@
 <script>
   /* global jQuery */
   jQuery(function($) {
+    // Cache document and items
+    var $document = $(document);
+    var $page     = $document.find("#custom-menu-admin");
+    var $form     = $page.find("form");
+    var $items    = $page.find(".items");
+
     // Get a template (by name attribute)
     function getTemplate(name) {
-      return $($("template[name='" + name + "']").html());
+      return $($page.find("template[name='" + name + "']").html());
     }
-
-    // Cache document and items
-    var $document    = $(document);
-    var $form        = $document.find("#custom-menu-admin");
-    var $items       = $("form .items");
-    var itemTemplate = getTemplate("admin-menu-item");
 
     function getClosestItem(elem) {
       return $(elem).closest(".item");
@@ -112,7 +108,7 @@
       $form.on("click", ".undent", decreaseItemIndentCallback);
 
       // Hide the slug dropdown if the value selected is empty
-      $document.on("change", ".slugDropdown", toggleItemSlugDropdown);
+      $form.on("change", ".slugDropdown", toggleItemSlugDropdown);
 
       // Force all of the empty slug dropdowns to be hidden
       $form.find(".slugDropdown").trigger("change");
@@ -122,7 +118,13 @@
   }); // ready
 </script>
 
-<form id="custom-menu-admin" method="post" action="<?php echo $url; ?>">
+<section id="custom-menu-admin">
+
+<template name="admin-menu-item">
+  <?php $this->adminItem(array()); ?>
+</template>
+
+<form method="post" action="<?php echo $url; ?>">
   <div>
     <p>
       <input type="hidden" name="oldname" value="<?php if (isset($_GET['menu'])) echo $_GET['menu']; ?>">
@@ -150,3 +152,4 @@
     <a href="<?php echo $url; ?>" class="cancel"><?php echo i18n_r(self::FILE.'/BACK'); ?></a>
   </div>
 </form>
+</section>
