@@ -82,21 +82,21 @@
     });
 
     // Hide the slug dropdown if the value selected is empty
-    $document.on('change', '.slugDropdown', function(e) {
-      var value = $(this).val();
-      var $this = $(this);
+    $document.on("change", ".slugDropdown", function(evt) {
+      var $dropdown = $(evt.target);
+      var value = $dropdown.val();
 
       if (value == '') {
         // The .slugText element should have its value sent to the POST slug[] array
-        $(this).next('.slugText').attr('name', 'slug[]').show();
-        $this.removeAttr('name');
+        $dropdown.next('.slugText').attr('name', 'slug[]').show();
+        $dropdown.removeAttr('name');
       } else {
         // The dropdown's value show be sent to the POST slug[] array
-        $(this).next('.slugText').removeAttr('name').hide();
-        $this.attr('name', 'slug[]').show();
+        $dropdown.next('.slugText').removeAttr('name').hide();
+        $dropdown.attr('name', 'slug[]').show();
       }
 
-      return false;
+      evt.preventDefault();
     });
 
     // Force all of the empty slug dropdowns to be hidden
