@@ -13,58 +13,98 @@
     var $form     = $page.find("form");
     var $items    = $page.find(".items");
 
+    // Encapsulate item traversal logic in a class
+    class Item {
+      constructor(elem) {
+        this.$elem = $(elem);
+      }
+
+      // Get the next adjacent item
+      next() {
+        return this.$elem.next();
+      }
+
+      // Get the previous adjacent item
+      prev() {
+        return this.$elem.prev();
+      }
+
+      // Get the current level
+      getLevel() {
+        var level = this.$elem.find(".level").val();
+        return parseInt(level);
+      }
+
+      // Set the current level
+      setLevel(level = 0) {
+        this.$elem.find(".level").val(level);
+        this.$elem.css("margin-left", level * 20);
+      }
+
+      // Get the closest item to the current elemtn
+      static closest(elem) {
+        return $(elem).closest(".item");
+      }
+    }
+
     // Get a template (by name attribute)
     function getTemplate(name) {
       return $($page.find("template[name='" + name + "']").html());
     }
 
-    function getClosestItem(elem) {
-      return $(elem).closest(".item");
+    function initializeItem(elem) {
+      var $elem = $(elem);
+      $elem.data("item", new Item($elem));
     }
 
     function addItemCallback(evt) {
       var template = getTemplate("admin-menu-item");
+      initializeItem(template);
       $items.append(template);
 
       evt.preventDefault();
     }
 
     function deleteItemCallback(evt) {
-      var $item = getClosestItem(evt.target);
+      var $item = Item.closest(evt.target);
       $item.remove();
 
       evt.preventDefault();
     }
 
     function openItemSettingsCallback(evt) {
-      var $item = getClosestItem(evt.target);
+      var $item = Item.closest(evt.target);
       $item.find('.advanced').slideToggle();
 
       evt.preventDefault();
     }
 
     function increaseItemIndentCallback(evt) {
-      var $item    = getClosestItem(evt.target);
-      var selector = $item.find('.level');
-      var val      = parseInt(selector.val()) + 1;
-      var prevVal  = parseInt($item.prev().find('.level').val());
+      // Get the current and previous item's level
+      var $item     = Item.closest(evt.target);
+      var item      = $item.data("item");
+      var $prev     = item.prev();
+      var prev      = $prev.data("item");
+      var level     = item.getLevel() + 1;
+      var prevLevel = prev.getLevel();
 
-      if ((val - prevVal) <= 1) {
-        selector.val(val);
-        $item.css('margin-left', val * 20);
+      // Don't allow increases more than 1 level beyond prev item
+      if ((level - prevLevel) <= 1) {
+        item.setLevel(level);
       }
 
       evt.preventDefault();
     }
 
     function decreaseItemIndentCallback(evt) {
-      var $item    = getClosestItem(evt.target);
-      var selector = $item.find('.level');
-      var val      = parseInt(selector.val()) - 1;
+      // Get th ecurrent item's level
+      var $item = Item.closest(evt.target);
+      var item  = $item.data("item");
+      var level = item.getLevel() - 1;
 
-      if (val >= 0) {
-        selector.val(val);
-        $item.css('margin-left', val * 20);
+      // Don't allow decreases below level 0
+      if (level >= 0) {
+        item.setLevel(level);
       }
 
       evt.preventDefault();
@@ -89,8 +129,11 @@
 
     // Initialize
     function init() {
-            // Make each ".item" element sortable
+      // Make each ".item" element sortable
       $items.sortable();
+
+      // Initialize the existing items first
+      $items.find(".item").each((idx, elem) => initializeItem(elem));
 
       // Inject a new item to the items list
       $form.on("click", ".add", addItemCallback);
