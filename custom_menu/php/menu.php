@@ -66,6 +66,11 @@
         }
       }
 
+      // Toggle the settings/advanced panel
+      toggleSettings() {
+        this.$elem.find('.advanced').slideToggle();
+      }
+
       // Get the closest item to the current elemtn
       static closest(elem) {
         return $(elem).closest(".item");
@@ -99,7 +104,8 @@
 
     function openItemSettingsCallback(evt) {
       var $item = Item.closest(evt.target);
-      $item.find('.advanced').slideToggle();
+      var item  = $item.data("item");
+      item.toggleSettings();
 
       evt.preventDefault();
     }
