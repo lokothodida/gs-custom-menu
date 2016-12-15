@@ -25,35 +25,28 @@
       return $(elem).closest(".item");
     }
 
-    // Make each ".item" element sortable
-    $items.sortable();
-
-    // Inject a new item to the items list
-    $('.add').click(function(evt) {
+    function addItemCallback(evt) {
       var template = getTemplate("admin-menu-item");
       $items.append(template);
 
       evt.preventDefault();
-    });
+    }
 
-    // Remove an item from the items list
-    $document.on("click", ".delete", function(evt) {
+    function deleteItemCallback(evt) {
       var $item = getClosestItem(evt.target);
       $item.remove();
 
       evt.preventDefault();
-    });
+    }
 
-    // Open the advanced settings for an item
-    $document.on("click", ".open", function(evt) {
+    function openItemSettingsCallback(evt) {
       var $item = getClosestItem(evt.target);
       $item.find('.advanced').slideToggle();
 
       evt.preventDefault();
-    });
+    }
 
-    // Increase an item's indentation level
-    $document.on("click", ".indent", function(evt) {
+    function increaseItemIndentCallback(evt) {
       var $item    = getClosestItem(evt.target);
       var selector = $item.find('.level');
       var val      = parseInt(selector.val()) + 1;
@@ -65,10 +58,9 @@
       }
 
       evt.preventDefault();
-    });
+    }
 
-    // Decrease an item's indentation level
-    $document.on("click", ".undent", function(evt) {
+    function decreaseItemIndentCallback(evt) {
       var $item    = getClosestItem(evt.target);
       var selector = $item.find('.level');
       var val      = parseInt(selector.val()) - 1;
@@ -79,10 +71,9 @@
       }
 
       evt.preventDefault();
-    });
+    }
 
-    // Hide the slug dropdown if the value selected is empty
-    $document.on("change", ".slugDropdown", function(evt) {
+    function toggleItemSlugDropdown(evt) {
       var $dropdown = $(evt.target);
       var value = $dropdown.val();
 
@@ -97,10 +88,36 @@
       }
 
       evt.preventDefault();
-    });
+    }
 
-    // Force all of the empty slug dropdowns to be hidden
-    $('.slugDropdown').trigger('change');
+    // Initialize
+    function init() {
+            // Make each ".item" element sortable
+      $items.sortable();
+
+      // Inject a new item to the items list
+      $document.on("click", ".add", addItemCallback);
+
+      // Remove an item from the items list
+      $document.on("click", ".delete", deleteItemCallback);
+
+      // Open the advanced settings for an item
+      $document.on("click", ".open", openItemSettingsCallback);
+
+      // Increase an item's indentation level
+      $document.on("click", ".indent", increaseItemIndentCallback);
+
+      // Decrease an item's indentation level
+      $document.on("click", ".undent", decreaseItemIndentCallback);
+
+      // Hide the slug dropdown if the value selected is empty
+      $document.on("change", ".slugDropdown", toggleItemSlugDropdown);
+
+      // Force all of the empty slug dropdowns to be hidden
+      $(".slugDropdown").trigger("change");
+    }
+
+    init();
   }); // ready
 </script>
 
