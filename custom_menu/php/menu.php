@@ -5,184 +5,185 @@
 </style>
 
 <script>
-  /* global jQuery */
-  jQuery(function($) {
-    // Cache document and items
-    var $document = $(document);
-    var $page     = $document.find("#custom-menu-admin");
-    var $form     = $page.find("form");
-    var $items    = $page.find(".items");
+/* global jQuery */
+jQuery(function($) {
+  // Cache document and items
+  var $document = $(document);
+  var $page     = $document.find("#custom-menu-admin");
+  var $form     = $page.find("form");
+  var $items    = $page.find(".items");
 
-    // Encapsulate item traversal logic in a class
-    class Item {
-      constructor(elem) {
-        this.$elem = $(elem);
-      }
+  // Encapsulate item traversal logic in a class
+  // This will be assigned to the "data" attribute of the given elem
+  class Item {
+    constructor(elem) {
+      this.$elem = $(elem);
+    }
 
-      // Get the next adjacent item
-      next() {
-        return this.$elem.next();
-      }
+    // Get the next adjacent item
+    next() {
+      return this.$elem.next();
+    }
 
-      // Get the previous adjacent item
-      prev() {
-        return this.$elem.prev();
-      }
+    // Get the previous adjacent item
+    prev() {
+      return this.$elem.prev();
+    }
 
-      // Get the current level
-      getLevel() {
-        var level = this.$elem.find(".level").val();
-        return parseInt(level, 10);
-      }
+    // Get the current level
+    getLevel() {
+      var level = this.$elem.find(".level").val();
+      return parseInt(level, 10);
+    }
 
-      // Set the current level
-      setLevel(level = 0) {
-        this.$elem.find(".level").val(level);
-        this.$elem.css("margin-left", level * 20);
-      }
+    // Set the current level
+    setLevel(level = 0) {
+      this.$elem.find(".level").val(level);
+      this.$elem.css("margin-left", level * 20);
+    }
 
-      // Get the dropdown
-      getSlugDropdown() {
-        return this.$elem.find(".slugDropdown");
-      }
+    // Get the dropdown
+    getSlugDropdown() {
+      return this.$elem.find(".slugDropdown");
+    }
 
-      // Get slug dropdown
-      getSlug() {
-        return this.getSlugDropdown().val();
-      }
+    // Get slug dropdown
+    getSlug() {
+      return this.getSlugDropdown().val();
+    }
 
-      // Set slug dropdown
-      setSlug(value) {
-        var $dropdown = this.getSlugDropdown();
+    // Set slug dropdown
+    setSlug(value) {
+      var $dropdown = this.getSlugDropdown();
 
-        if (value == '') {
-          // The .slugText element should have its value sent to the POST slug[] array
-          $dropdown.next('.slugText').attr('name', 'slug[]').show();
-          $dropdown.removeAttr('name');
-        } else {
-          // The dropdown's value show be sent to the POST slug[] array
-          $dropdown.next('.slugText').removeAttr('name').hide();
-          $dropdown.attr('name', 'slug[]').show();
-        }
-      }
-
-      // Toggle the settings/advanced panel
-      toggleSettings() {
-        this.$elem.find('.advanced').slideToggle();
-      }
-
-      // Get the closest item to the current elemtn
-      static closest(elem) {
-        return $(elem).closest(".item");
+      if (value == '') {
+        // The .slugText element should have its value sent to the POST slug[] array
+        $dropdown.next('.slugText').attr('name', 'slug[]').show();
+        $dropdown.removeAttr('name');
+      } else {
+        // The dropdown's value show be sent to the POST slug[] array
+        $dropdown.next('.slugText').removeAttr('name').hide();
+        $dropdown.attr('name', 'slug[]').show();
       }
     }
 
-    // Get a template (by name attribute)
-    function getTemplate(name) {
-      return $($page.find("template[name='" + name + "']").html());
+    // Toggle the settings/advanced panel
+    toggleSettings() {
+      this.$elem.find('.advanced').slideToggle();
     }
 
-    function initializeItem(elem) {
-      var $elem = $(elem);
-      $elem.data("item", new Item($elem));
+    // Get the closest item to the current elemtn
+    static closest(elem) {
+      return $(elem).closest(".item");
+    }
+  }
+
+  // Get a template (by name attribute)
+  function getTemplate(name) {
+    return $($page.find("template[name='" + name + "']").html());
+  }
+
+  function initializeItem(elem) {
+    var $elem = $(elem);
+    $elem.data("item", new Item($elem));
+  }
+
+  function addItemCallback(evt) {
+    var template = getTemplate("admin-menu-item");
+    initializeItem(template);
+    $items.append(template);
+
+    evt.preventDefault();
+  }
+
+  function deleteItemCallback(evt) {
+    var $item = Item.closest(evt.target);
+    $item.remove();
+
+    evt.preventDefault();
+  }
+
+  function openItemSettingsCallback(evt) {
+    var $item = Item.closest(evt.target);
+    var item  = $item.data("item");
+    item.toggleSettings();
+
+    evt.preventDefault();
+  }
+
+  function increaseItemIndentCallback(evt) {
+    // Get the current and previous item's level
+    var $item     = Item.closest(evt.target);
+    var item      = $item.data("item");
+    var $prev     = item.prev();
+    var prev      = $prev.data("item");
+    var level     = item.getLevel() + 1;
+    var prevLevel = prev.getLevel();
+
+    // Don't allow increases more than 1 level beyond prev item
+    if ((level - prevLevel) <= 1) {
+      item.setLevel(level);
     }
 
-    function addItemCallback(evt) {
-      var template = getTemplate("admin-menu-item");
-      initializeItem(template);
-      $items.append(template);
+    evt.preventDefault();
+  }
 
-      evt.preventDefault();
+  function decreaseItemIndentCallback(evt) {
+    // Get th ecurrent item's level
+    var $item = Item.closest(evt.target);
+    var item  = $item.data("item");
+    var level = item.getLevel() - 1;
+
+    // Don't allow decreases below level 0
+    if (level >= 0) {
+      item.setLevel(level);
     }
 
-    function deleteItemCallback(evt) {
-      var $item = Item.closest(evt.target);
-      $item.remove();
+    evt.preventDefault();
+  }
 
-      evt.preventDefault();
-    }
+  function toggleItemSlugDropdown(evt) {
+    var $item = Item.closest(evt.target);
+    var item  = $item.data("item");
+    var value = item.getSlug();
 
-    function openItemSettingsCallback(evt) {
-      var $item = Item.closest(evt.target);
-      var item  = $item.data("item");
-      item.toggleSettings();
+    item.setSlug(value);
 
-      evt.preventDefault();
-    }
+    evt.preventDefault();
+  }
 
-    function increaseItemIndentCallback(evt) {
-      // Get the current and previous item's level
-      var $item     = Item.closest(evt.target);
-      var item      = $item.data("item");
-      var $prev     = item.prev();
-      var prev      = $prev.data("item");
-      var level     = item.getLevel() + 1;
-      var prevLevel = prev.getLevel();
+  // Initialize
+  function init() {
+    // Make each ".item" element sortable
+    $items.sortable();
 
-      // Don't allow increases more than 1 level beyond prev item
-      if ((level - prevLevel) <= 1) {
-        item.setLevel(level);
-      }
+    // Initialize the existing items first
+    $items.find(".item").each((idx, elem) => initializeItem(elem));
 
-      evt.preventDefault();
-    }
+    // Inject a new item to the items list
+    $form.on("click", ".add", addItemCallback);
 
-    function decreaseItemIndentCallback(evt) {
-      // Get th ecurrent item's level
-      var $item = Item.closest(evt.target);
-      var item  = $item.data("item");
-      var level = item.getLevel() - 1;
+    // Remove an item from the items list
+    $form.on("click", ".delete", deleteItemCallback);
 
-      // Don't allow decreases below level 0
-      if (level >= 0) {
-        item.setLevel(level);
-      }
+    // Open the advanced settings for an item
+    $form.on("click", ".open", openItemSettingsCallback);
 
-      evt.preventDefault();
-    }
+    // Increase an item's indentation level
+    $form.on("click", ".indent", increaseItemIndentCallback);
 
-    function toggleItemSlugDropdown(evt) {
-      var $item = Item.closest(evt.target);
-      var item  = $item.data("item");
-      var value = item.getSlug();
+    // Decrease an item's indentation level
+    $form.on("click", ".undent", decreaseItemIndentCallback);
 
-      item.setSlug(value);
+    // Hide the slug dropdown if the value selected is empty
+    $form.on("change", ".slugDropdown", toggleItemSlugDropdown);
 
-      evt.preventDefault();
-    }
+    // Force all of the empty slug dropdowns to be hidden
+    $form.find(".slugDropdown").trigger("change");
+  }
 
-    // Initialize
-    function init() {
-      // Make each ".item" element sortable
-      $items.sortable();
-
-      // Initialize the existing items first
-      $items.find(".item").each((idx, elem) => initializeItem(elem));
-
-      // Inject a new item to the items list
-      $form.on("click", ".add", addItemCallback);
-
-      // Remove an item from the items list
-      $form.on("click", ".delete", deleteItemCallback);
-
-      // Open the advanced settings for an item
-      $form.on("click", ".open", openItemSettingsCallback);
-
-      // Increase an item's indentation level
-      $form.on("click", ".indent", increaseItemIndentCallback);
-
-      // Decrease an item's indentation level
-      $form.on("click", ".undent", decreaseItemIndentCallback);
-
-      // Hide the slug dropdown if the value selected is empty
-      $form.on("change", ".slugDropdown", toggleItemSlugDropdown);
-
-      // Force all of the empty slug dropdowns to be hidden
-      $form.find(".slugDropdown").trigger("change");
-    }
-
-    init();
-  }); // ready
+  init();
+});
 </script>
 
 <section id="custom-menu-admin">
