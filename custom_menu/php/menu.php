@@ -18,6 +18,7 @@
 
     // Cache document and items
     var $document    = $(document);
+    var $form        = $document.find("#custom-menu-admin");
     var $items       = $("form .items");
     var itemTemplate = getTemplate("admin-menu-item");
 
@@ -96,32 +97,32 @@
       $items.sortable();
 
       // Inject a new item to the items list
-      $document.on("click", ".add", addItemCallback);
+      $form.on("click", ".add", addItemCallback);
 
       // Remove an item from the items list
-      $document.on("click", ".delete", deleteItemCallback);
+      $form.on("click", ".delete", deleteItemCallback);
 
       // Open the advanced settings for an item
-      $document.on("click", ".open", openItemSettingsCallback);
+      $form.on("click", ".open", openItemSettingsCallback);
 
       // Increase an item's indentation level
-      $document.on("click", ".indent", increaseItemIndentCallback);
+      $form.on("click", ".indent", increaseItemIndentCallback);
 
       // Decrease an item's indentation level
-      $document.on("click", ".undent", decreaseItemIndentCallback);
+      $form.on("click", ".undent", decreaseItemIndentCallback);
 
       // Hide the slug dropdown if the value selected is empty
       $document.on("change", ".slugDropdown", toggleItemSlugDropdown);
 
       // Force all of the empty slug dropdowns to be hidden
-      $(".slugDropdown").trigger("change");
+      $form.find(".slugDropdown").trigger("change");
     }
 
     init();
   }); // ready
 </script>
 
-<form method="post" action="<?php echo $url; ?>">
+<form id="custom-menu-admin" method="post" action="<?php echo $url; ?>">
   <div>
     <p>
       <input type="hidden" name="oldname" value="<?php if (isset($_GET['menu'])) echo $_GET['menu']; ?>">
