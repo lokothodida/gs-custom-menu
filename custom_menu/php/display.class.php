@@ -13,10 +13,12 @@ class CustomMenuDisplay {
   private $classes = array();
 
   public function __construct($menu, $classes = array()) {
-    if (!isset($classes['currentpath'])) $classes['currentpath'] = 'currentpath';
-    if (!isset($classes['current'])) $classes['current'] = 'current';
-    if (!isset($classes['parent'])) $classes['parent'] = 'parent';
-    if (!isset($classes['child'])) $classes['child'] = 'child';
+    $classes = array_merge($classes, array(
+      'currentpath' => 'currentpath',
+      'current'     => 'current',
+      'parent'      => 'parent',
+      'child'       => 'child'
+    ));
 
     $this->classes = $classes;
     $this->menu = CustomMenuData::getMenu($menu);
@@ -24,9 +26,9 @@ class CustomMenuDisplay {
   }
 
   # get the full current url (http://www.phpro.org/examples/Get-Full-URL.html)
-  public function currentURL($path=true) {
+  public function currentURL($path = true) {
     $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http';
-    return trim($protocol.'://'.$_SERVER['HTTP_HOST'].($path ? $_SERVER['REQUEST_URI'] : ''));
+    return trim($protocol . '://' . $_SERVER['HTTP_HOST'] . ($path ? $_SERVER['REQUEST_URI'] : ''));
   }
 
   # parse the url
