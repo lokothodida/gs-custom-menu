@@ -22,12 +22,12 @@ class CustomMenu {
   }
 
   # string to slug (by Gilbert Pellegrom)
-  public function strtoslug($string) {
-    return strtolower(trim(preg_replace('/[^A-Za-z0-9-_]+/', '-', $this->transliterate($string))));
+  static public function strtoslug($string) {
+    return strtolower(trim(preg_replace('/[^A-Za-z0-9-_]+/', '-', self::transliterate($string))));
   }
 
   # transliteration
-  public function transliterate($string) {
+  static public function transliterate($string) {
     global $i18n;
     if (isset($i18n['TRANSLITERATION']) && is_array($translit = $i18n['TRANSLITERATION']) && count($translit > 0)) {
       $string =  str_replace(array_keys($translit), array_values($translit), $string);
@@ -69,8 +69,9 @@ class CustomMenu {
     // load pages array
     $pages = glob(GSDATAPAGESPATH.'*.xml');
     $slugs = array();
+
     foreach ($pages as $page) {
-      $slugs[] = trim(str_replace(array(GSDATAPAGESPATH, '.xml'), '', $page));
+      $slugs[] = basename($page, '.xml');
     }
 
     ob_start();
@@ -141,21 +142,6 @@ class CustomMenu {
     else return $content;
   }
 
-  # quickly parses array to an XML structure
-  private function array2XMLrecurse($array, $xml) {
-    foreach ($array as $key => $value) {
-      $val = is_array($value) ? $this->array2XMLrecurse($value, $xml) : $value;
-      $node = $xml->addChild($key, $val);
-    }
-    return $xml;
-  }
-
-  # array to xml
-  private function array2XML($array, $root='<channel/>') {
-    $xml = new SimpleXMLElement($root);
-    return $this->array2XMLrecurse($array, $xml);
-  }
-
   # load items from menu (as array)
   public function getItems($menu) {
     return CustomMenuData::getMenu($menu);
@@ -188,24 +174,25 @@ class CustomMenu {
   public function admin() {
     global $SITEURL;
     $init = CustomMenuData::init();
-    $url  = 'load.php?id='. self::FILE;
+    $url  = 'load.php?id=' . self::FILE;
     $path = GSPLUGINPATH . self::FILE . '/php/';
 
     // POST query handling
     $msg = self::processPostQuery();
 
-    // error message
+    // Some JavaScript for displaying the error message
     if ($msg) {
       ?>
       <script>
         jQuery(function($) {
-          $('div.bodycontent').before('<div class="' + <?php echo json_encode($msg['status']); ?> + '" style="display:block;">'+<?php echo json_encode($msg['msg']); ?>+'</div>');
-        }); // ready
+          var msg = <?php echo json_encode($msg); ?>;
+          $('div.bodycontent').before('<div class="' + msg.status + '" style="display:block;">' + msg.msg + '</div>');
+        });
       </script>
       <?php
     }
 
-    // Select page
+    // Display the correct page
     if (isset($_GET['create'])) {
       // Create a menu
       include($path . 'menu.php');
