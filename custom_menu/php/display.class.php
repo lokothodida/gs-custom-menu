@@ -12,16 +12,14 @@ class CustomMenuDisplay {
   private $url = array();
   private $classes = array();
 
-  public function __construct($menu, $classes=array()) {
-    $custommenu = new CustomMenu;
-
+  public function __construct($menu, $classes = array()) {
     if (!isset($classes['currentpath'])) $classes['currentpath'] = 'currentpath';
     if (!isset($classes['current'])) $classes['current'] = 'current';
     if (!isset($classes['parent'])) $classes['parent'] = 'parent';
     if (!isset($classes['child'])) $classes['child'] = 'child';
 
     $this->classes = $classes;
-    $this->menu = $custommenu->getItems($menu);
+    $this->menu = CustomMenuData::getMenu($menu);
     $this->parse();
   }
 
