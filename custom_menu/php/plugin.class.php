@@ -133,13 +133,16 @@ class CustomMenu {
     return $msg;
   }
 
-  static public function getMenuItemTemplate($item, $mode = true) {
-    if (!isset($item['title'])) $item['title'] = '';
-    if (!isset($item['url'])) $item['url'] = '';
-    if (!isset($item['slug'])) $item['slug'] = '';
-    if (!isset($item['level'])) $item['level'] = 0;
-    if (!isset($item['target'])) $item['target'] = '_self';
-    if (!isset($item['img'])) $item['img'] = null;
+  static public function getMenuItemTemplate($item = array(), $mode = true) {
+    // Default data for item
+    $item = array_merge($item, array(
+      'title'  => '',
+      'url'    => '',
+      'slug'   => '',
+      'level'  => 0,
+      'target' => '_self',
+      'img'    => null,
+    ));
 
     // prevents array to string conversion problem
     foreach ($item as $node => $val) {
@@ -147,7 +150,7 @@ class CustomMenu {
     }
 
     // load pages array
-    $pages = glob(GSDATAPAGESPATH.'*.xml');
+    $pages = glob(GSDATAPAGESPATH . '*.xml');
     $slugs = array();
 
     foreach ($pages as $page) {

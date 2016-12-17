@@ -189,7 +189,7 @@ jQuery(function($) {
 <section id="custom-menu-admin">
 
 <template name="admin-menu-item">
-  <?php CustomMenu::getMenuItemTemplate(array()); ?>
+  <?php CustomMenu::getMenuItemTemplate(); ?>
 </template>
 
 <form method="post" action="<?php echo $url; ?>">
@@ -209,7 +209,7 @@ jQuery(function($) {
 
         if (empty($items)) {
           // Show an empty item by default
-          CustomMenu::getMenuItemTemplate(array());
+          CustomMenu::getMenuItemTemplate();
         }
       ?>
     </div>
