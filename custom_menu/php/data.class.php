@@ -171,4 +171,19 @@ class CustomMenuData {
 
     return $dom->save($newfile);
   }
+
+  static public function deleteMenu($slug) {
+    // Delete a menu
+    $file = self::getMenuFilename($slug);
+
+    return file_exists($file) && (bool) unlink($file);
+  }
+
+  static public function menuExists($slug) {
+    return file_exists(self::getMenuFilename($slug));
+  }
+
+  static public function getMenuFilename($slug) {
+    return GSDATAOTHERPATH . CustomMenu::FILE . '/' . $slug . '.xml';
+  }
 }

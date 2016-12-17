@@ -104,6 +104,7 @@ class CustomMenu {
     if (!empty($_POST['createMenu'])) {
       // Create a menu
       $create = CustomMenuData::saveMenu($_POST);
+
       if ($create) {
         $msg = array('status' => 'updated', 'msg' => self::i18n_r('MENU_CREATE_SUCCESS'));
       } else {
@@ -112,6 +113,7 @@ class CustomMenu {
     } elseif (!empty($_POST['saveMenu'])) {
       // Update a menu
       $save = CustomMenuData::saveMenu($_POST);
+
       if ($save) {
         $msg = array('status' => 'updated', 'msg' => str_replace('%s', '<b>'.$_POST['name'].'</b>', self::i18n_r('MENU_UPDATE_SUCCESS')));
       } else {
@@ -119,15 +121,12 @@ class CustomMenu {
       }
     } elseif (!empty($_GET['delete'])) {
       // Delete a menu
-      $file = GSDATAOTHERPATH.self::FILE.'/'.$_GET['delete'].'.xml';
+      $delete = CustomMenuData::deleteMenu($_GET['delete']);
 
-      if (file_exists($file)) {
-        $delete = unlink($file);
-        if ($delete) {
-          $msg = array('status' => 'updated', 'msg' => str_replace('%s', '<b>'.$_GET['delete'].'</b>', self::i18n_r('MENU_DEL_SUCCESS')));
-        } else {
-          $msg = array('status' => 'error', 'msg' => self::i18n_r('MENU_DEL_ERROR'));
-        }
+      if ($delete) {
+        $msg = array('status' => 'updated', 'msg' => str_replace('%s', '<b>' . $_GET['delete'] . '</b>', self::i18n_r('MENU_DEL_SUCCESS')));
+      } else {
+        $msg = array('status' => 'error', 'msg' => self::i18n_r('MENU_DEL_ERROR'));
       }
     }
 
