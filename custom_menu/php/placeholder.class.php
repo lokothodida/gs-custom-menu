@@ -1,5 +1,10 @@
 <?php
 
+/*
+  Replaces the $content variable's placeholders with the custom menu HTML
+  uses CustomMenu
+       CustomMenuDisplay
+  */
 class CustomMenuPlaceholder {
   static public function filter($content) {
     $regex = '/\(% ' . CustomMenu::FILE . '(.*?)%\)/i';

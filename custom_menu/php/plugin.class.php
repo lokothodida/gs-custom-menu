@@ -1,5 +1,9 @@
 <?php
 
+/*
+  Main plugin class (and bootstrapper)
+  uses CustomMenuPlaceholder
+  */
 class CustomMenu {
   /* constants */
   const FILE = 'custom_menu';
