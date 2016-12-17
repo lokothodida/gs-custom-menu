@@ -6,7 +6,7 @@
 
 <script>
 /* global jQuery */
-jQuery.ready(function($) {
+jQuery(function($) {
   // Force the input button to be an anchor to the creation page
   $('a.create').hide();
   $('input.create').show();
@@ -28,7 +28,7 @@ jQuery.ready(function($) {
   </thead>
   <tbody>
     <?php
-      $menus = $this->getMenus();
+      $menus = CustomMenuData::getMenus();
       foreach ($menus as $name => $menu) {
     ?>
       <tr>
