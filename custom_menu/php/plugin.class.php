@@ -12,15 +12,7 @@ class CustomMenu {
   const URL     = 'http://github.com/lokothodida';
   const PAGE    = 'pages';
 
-  /* properties */
-  private $plugin = array();
-
   /* methods */
-  # constructor
-  public function __construct() {
-    // may be used in later iterations
-  }
-
   static public function i18n_r($hash) {
     return i18n_r(self::FILE . '/' . $hash);
   }
@@ -43,113 +35,6 @@ class CustomMenu {
     return $string;
   }
 
-  # info
-  public function info($info) {
-    if (empty($this->plugin)) {
-      $this->plugin['id'] = self::FILE;
-      $this->plugin['name'] = i18n_r(self::FILE.'/PLUGIN_NAME');
-      $this->plugin['version'] = self::VERSION;
-      $this->plugin['author'] = self::AUTHOR;
-      $this->plugin['url'] = self::URL;
-      $this->plugin['description'] = i18n_r(self::FILE.'/PLUGIN_DESC');
-      $this->plugin['page'] = self::PAGE;
-      $this->plugin['sidebar'] = i18n_r(self::FILE.'/PLUGIN_SIDEBAR');
-    }
-
-    if (isset($this->plugin[$info])) return $this->plugin[$info];
-    else return false;
-  }
-
-  private function adminItem($item, $mode = true) {
-    if (!isset($item['title'])) $item['title'] = '';
-    if (!isset($item['url'])) $item['url'] = '';
-    if (!isset($item['slug'])) $item['slug'] = '';
-    if (!isset($item['level'])) $item['level'] = 0;
-    if (!isset($item['target'])) $item['target'] = '_self';
-    if (!isset($item['img'])) $item['img'] = null;
-
-
-    // prevents array to string conversion problem
-    foreach ($item as $node => $val) {
-      if (is_array($val)) $item[$node] = '';
-    }
-
-    // load pages array
-    $pages = glob(GSDATAPAGESPATH.'*.xml');
-    $slugs = array();
-
-    foreach ($pages as $page) {
-      $slugs[] = basename($page, '.xml');
-    }
-
-    ob_start();
-    ?>
-    <div id="metadata_window" class="item" style="margin-left: <?php echo $item['level'] * 20; ?>px;">
-      <p>
-        <input type="hidden" class="level" name="level[]" value="<?php echo $item['level']; ?>">
-        <label style="overflow: hidden; margin-bottom: 4px;">
-          <span><?php echo i18n_r(self::FILE.'/TITLE'); ?></span>
-
-          <span style="float: right; margin-right: 10px;">[
-          <a href="" class="cancel open" style="text-decoration: none;">&#x25BC;</a>
-          <a href="" class="cancel undent" style="text-decoration: none;">&larr;</a>
-          <a href="" class="cancel indent" style="text-decoration: none;">&rarr;</a>
-          <a href="" class="cancel delete" style="text-decoration: none;">&times;</a>
-          ]
-          </span>
-        </label>
-        <input type="text" class="text" name="title[]" value="<?php echo $item['title']; ?>" required>
-      </p>
-
-      <div class="advanced">
-        <div class="leftopt">
-          <p>
-            <label><?php echo i18n_r(self::FILE.'/URL'); ?></label>
-            <input type="text" class="text" name="url[]" value="<?php echo $item['url']; ?>">
-          </p>
-          <p>
-            <label><?php echo i18n_r(self::FILE.'/SLUG'); ?></label>
-            <select class="text slugDropdown" name="slug[]">
-              <option value="">----</option>
-              <?php foreach ($slugs as $slug) { ?>
-                <option value="<?php echo $slug; ?>" <?php if ($slug && $slug == $item['slug']) echo 'selected="selected"'; ?>><?php echo $slug; ?></option>
-              <?php } ?>
-            </select>
-            <input type="text" class="text slugText" style="margin-top: 5px !important;" value="<?php echo $item['slug']; ?>">
-          </p>
-        </div>
-        <div class="rightopt">
-          <p>
-            <label><?php echo i18n_r(self::FILE.'/TARGET'); ?></label>
-            <select name="target[]" class="text">
-              <option value="" <?php if ($item['target'] == '') echo 'selected="selected"'; ?>>---</option>
-              <option <?php if ($item['target'] == '_self') echo 'selected="selected"'; ?>>_self</option>
-              <option <?php if ($item['target'] == '_blank') echo 'selected="selected"'; ?>>_blank</option>
-              <option <?php if ($item['target'] == '_parent') echo 'selected="selected"'; ?>>_parent</option>
-              <option <?php if ($item['target'] == '_top') echo 'selected="selected"'; ?>>_top</option>
-            </select>
-          </p>
-          <p>
-            <label><?php echo i18n_r(self::FILE.'/IMAGE'); ?></label>
-            <input type="text" class="text" name="img[]" value="<?php echo $item['img']; ?>">
-          </p>
-          <div class="nodes">
-          </div>
-        </div>
-        <div class="clear"></div>
-      </div>
-    </div>
-    <?php
-    $content = ob_get_contents();
-    ob_end_clean();
-
-    if ($mode == true) {
-      echo $content;
-      return null;
-    }
-    else return $content;
-  }
-
   # load items from menu (as array)
   public function getItems($menu) {
     return CustomMenuData::getMenu($menu);
@@ -166,20 +51,20 @@ class CustomMenu {
   }
 
   # header (for codemirror)
-  public function header() {
+  static public function header() {
     global $SITEURL;
     echo '<link href="'.$SITEURL.'admin/template/js/codemirror/lib/codemirror.css?v=screen" rel="stylesheet" media=""><link href="'.$SITEURL.'admin/template/js/codemirror/theme/default.css?v=screen" rel="stylesheet" media="">';
     echo '<script src="'.$SITEURL.'admin/template/js/fancybox/jquery.fancybox.pack.js?v=2.0.4"></script><script src="'.$SITEURL.'admin/template/js/codemirror/lib/codemirror-compressed.js?v=0.2.0"></script>';
   }
 
   # theme header
-  public function themeHeader() {
+  static public function themeHeader() {
     global $SITEURL;
     echo '<base href="'.$SITEURL.'">';
   }
 
   # admin
-  public function admin() {
+  static public function admin() {
     global $SITEURL;
     $init = CustomMenuData::init();
     $url  = 'load.php?id=' . self::FILE;
@@ -276,7 +161,7 @@ class CustomMenu {
       <p>
         <input type="hidden" class="level" name="level[]" value="<?php echo $item['level']; ?>">
         <label style="overflow: hidden; margin-bottom: 4px;">
-          <span><?php echo i18n_r(CustomMenu::FILE.'/TITLE'); ?></span>
+          <span><?php CustomMenu::i18n('TITLE'); ?></span>
 
           <span style="float: right; margin-right: 10px;">[
           <a href="" class="cancel open" style="text-decoration: none;">&#x25BC;</a>
@@ -292,11 +177,11 @@ class CustomMenu {
       <div class="advanced">
         <div class="leftopt">
           <p>
-            <label><?php echo i18n_r(self::FILE.'/URL'); ?></label>
+            <label><?php CustomMenu::i18n('URL'); ?></label>
             <input type="text" class="text" name="url[]" value="<?php echo $item['url']; ?>">
           </p>
           <p>
-            <label><?php echo i18n_r(self::FILE.'/SLUG'); ?></label>
+            <label><?php CustomMenu::i18n('SLUG'); ?></label>
             <select class="text slugDropdown" name="slug[]">
               <option value="">----</option>
               <?php foreach ($slugs as $slug) { ?>
@@ -308,7 +193,7 @@ class CustomMenu {
         </div>
         <div class="rightopt">
           <p>
-            <label><?php echo i18n_r(self::FILE.'/TARGET'); ?></label>
+            <label><?php CustomMenu::i18n('TARGET'); ?></label>
             <select name="target[]" class="text">
               <option value="" <?php if ($item['target'] == '') echo 'selected="selected"'; ?>>---</option>
               <option <?php if ($item['target'] == '_self') echo 'selected="selected"'; ?>>_self</option>
@@ -318,7 +203,7 @@ class CustomMenu {
             </select>
           </p>
           <p>
-            <label><?php echo i18n_r(self::FILE.'/IMAGE'); ?></label>
+            <label><?php CustomMenu::i18n('IMAGE'); ?></label>
             <input type="text" class="text" name="img[]" value="<?php echo $item['img']; ?>">
           </p>
           <div class="nodes">
