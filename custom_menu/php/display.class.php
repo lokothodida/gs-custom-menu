@@ -1,9 +1,9 @@
 <?php
 
 /*
- Prints out HTML for a custom menu
- uses CustomMenu
- */
+  Prints out HTML for a custom menu
+  uses CustomMenu
+  */
 class CustomMenuDisplay {
   # huge credit to http://www.jongales.com/blog/2009/01/27/php-class-for-threaded-comments/, which this script is based on
   private $menu;

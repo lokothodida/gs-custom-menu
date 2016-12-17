@@ -9,6 +9,7 @@
 
 # requires
   require_once(GSPLUGINPATH . $thisfile . '/php/plugin.class.php');
+  require_once(GSPLUGINPATH . $thisfile . '/php/data.class.php');
   require_once(GSPLUGINPATH . $thisfile . '/php/display.class.php');
   require_once(GSPLUGINPATH . $thisfile . '/php/placeholder.class.php');
 

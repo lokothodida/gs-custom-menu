@@ -37,37 +37,7 @@ class CustomMenu {
 
   # make initial files
   private function makeFiles() {
-    $return = array();
-    $paths = array(self::FILE);
-
-    // paths
-    foreach ($paths as $path) {
-      $fullPath = GSDATAOTHERPATH . $path;
-
-      if (!file_exists($fullPath)) {
-        $return[$path][] = mkdir($fullPath, 0755);
-
-        // writeable permissions final check
-        if (!is_writable ($fullPath)) {
-          $return[$path][] = chmod($fullPath, 0755);
-        }
-      }
-    }
-
-    // files
-    if (!file_exists(GSDATAOTHERPATH.self::FILE.'/default.xml')) {
-      $menu = array(
-        'name' => 'default',
-        'level' => array(0),
-        'slug' => array('index'),
-        'title' => array('Home'),
-        'url' => array('/'),
-        'target' => array('_self'),
-      );
-      $this->saveMenu($menu);
-    }
-
-    return $return;
+    return CustomMenuData::init();
   }
 
   # info
@@ -178,74 +148,7 @@ class CustomMenu {
 
   # parses menu structure from POST values
   private function saveMenu($post) {
-    // initialization
-    $return = $nodes = $saved = array();
-
-    foreach ($post as $key => $val) {
-      if (is_array($val)) $nodes[] = $key;
-    }
-
-    // sets up array
-    foreach ($post['level'] as $key => $level) {
-      foreach ($nodes as $node) {
-        $return[$key][$node] = $post[$node][$key];
-      }
-
-      // fill empty fields
-      if (empty($return[$key]['slug'])) $return[$key]['slug'] = $this->strtoslug($return[$key]['title']);
-
-      // final formatting
-      $return[$key]['slug'] = $this->strtoslug($return[$key]['slug']);
-      $return[$key]['url'] =  $this->transliterate($return[$key]['url']);
-
-      // checks to see slug doesn't already exist
-      /*
-      if (in_array($return[$key]['slug'], $saved)) {
-        $return[$key]['slug'] = $return[$key]['slug'].'-'.rand(0, 100);
-      }
-      */
-
-      // add to saved array
-      $saved[] = $return[$key]['slug'];
-    }
-
-    // build xml file
-    $xml = new SimpleXMLExtended('<?xml version="1.0" encoding="UTF-8"?><channel/>');
-    $cdata = array('title', 'url');
-    // menu items
-    $menu = $xml->addChild('menu');
-    foreach ($return as $key => $item) {
-      $itemxml = $menu->addChild('item');
-      foreach ($item as $field => $val) {
-        if (in_array($field, $cdata)) {
-          $itemxml->{$field} = null;
-          $itemxml->{$field}->addCData($val);
-        }
-        else $itemxml->addChild($field, $val);
-      }
-    }
-
-    // settings
-    $settings = $xml->addChild('settings');
-
-    // format the xml file (beautify)
-    $dom = new DOMDocument;
-    $dom->preserveWhiteSpace = false;
-    $dom->loadXML($xml->saveXML());
-    $dom->formatOutput = true;
-
-    // save to file
-    $post['name'] = $this->strtoslug($post['name']);
-    $newfile = GSDATAOTHERPATH.self::FILE.'/'.$post['name'].'.xml';
-
-    if (isset($post['oldname'])) {
-      $oldfile = GSDATAOTHERPATH.self::FILE.'/'.$post['oldname'].'.xml';
-      if (file_exists($oldfile) && !file_exists($newfile)) {
-        unlink($oldfile);
-      }
-    }
-
-    return $dom->save($newfile);
+    return CustomMenuData::saveMenu($post);
   }
 
   # quickly parses array to an XML structure
@@ -265,47 +168,12 @@ class CustomMenu {
 
   # load items from menu (as array)
   public function getItems($menu) {
-    $file = GSDATAOTHERPATH.self::FILE.'/'.$menu.'.xml';
-    if (file_exists($file)) {
-      $items = simplexml_load_file($file, 'SimpleXMLElement', LIBXML_NOCDATA); // thanks to http://blog.evandavey.com/2008/04/how-to-fix-simplexml-cdata-problem-in-php.html
-      $items = json_decode(json_encode($items), true);
-
-      // move channel node
-      if (isset($items['menu'])) {
-        $items = $items['menu'];
-      }
-
-      // old format
-      if (isset($items['item']['title'])) {
-        $items = array('item' => array($items['item']));
-      }
-
-      // new format
-      if (isset($items['channel']['item']['title'])) {
-        $items = array('item' => array($items['channel']['item']));
-      }
-
-      return $items['item'];
-    }
-    else return array();
+    return CustomMenuData::getMenu($menu);
   }
 
   # get menus
   public function getMenus() {
-    $return = array();
-    $menus = glob(GSDATAOTHERPATH.self::FILE.'/*.xml');
-
-    // force $menus to be an array
-    if ($menus === false) $menus = array();
-
-    foreach ($menus as $menu) {
-      $tmpname = explode('/', $menu);
-      $tmpname = trim(str_replace('.xml', '', end($tmpname)));
-      $tmpfile = $this->getItems($tmpname);
-      $return[$tmpname] = $tmpfile;
-    }
-
-    return $return;
+    return CustomMenuData::getMenus();
   }
 
   # placeholder evaluator
