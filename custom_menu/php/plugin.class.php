@@ -6,11 +6,11 @@
   */
 class CustomMenu {
   /* constants */
-  const FILE = 'custom_menu';
+  const FILE    = 'custom_menu';
   const VERSION = '0.6.1';
-  const AUTHOR = 'Lawrence Okoth-Odida';
-  const URL = 'http://github.com/lokothodida';
-  const PAGE = 'pages';
+  const AUTHOR  = 'Lawrence Okoth-Odida';
+  const URL     = 'http://github.com/lokothodida';
+  const PAGE    = 'pages';
 
   /* properties */
   private $plugin = array();
@@ -33,11 +33,6 @@ class CustomMenu {
       $string =  str_replace(array_keys($translit), array_values($translit), $string);
     }
     return $string;
-  }
-
-  # make initial files
-  private function makeFiles() {
-    return CustomMenuData::init();
   }
 
   # info
@@ -146,11 +141,6 @@ class CustomMenu {
     else return $content;
   }
 
-  # parses menu structure from POST values
-  private function saveMenu($post) {
-    return CustomMenuData::saveMenu($post);
-  }
-
   # quickly parses array to an XML structure
   private function array2XMLrecurse($array, $xml) {
     foreach ($array as $key => $value) {
@@ -197,22 +187,52 @@ class CustomMenu {
   # admin
   public function admin() {
     global $SITEURL;
-    $this->makeFiles();
-    $msg = false;
-    $url = 'load.php?id='.self::FILE;
-    $path = GSPLUGINPATH.self::FILE.'/php/';
+    $init = CustomMenuData::init();
+    $url  = 'load.php?id='. self::FILE;
+    $path = GSPLUGINPATH . self::FILE . '/php/';
+
+    // POST query handling
+    $msg = self::processPostQuery();
+
+    // error message
+    if ($msg) {
+      ?>
+      <script>
+        jQuery(function($) {
+          $('div.bodycontent').before('<div class="' + <?php echo json_encode($msg['status']); ?> + '" style="display:block;">'+<?php echo json_encode($msg['msg']); ?>+'</div>');
+        }); // ready
+      </script>
+      <?php
+    }
+
+    // Select page
+    if (isset($_GET['create'])) {
+      // Create a menu
+      include($path . 'menu.php');
+    } elseif (isset($_GET['menu'])) {
+      // Edit a menu
+      include($path . 'menu.php');
+    } else {
+      // Show menus
+      include($path . 'menus.php');
+    }
+  }
+
+  static protected function processPostQuery() {
+    $msg = null;
 
     if (!empty($_POST['createMenu'])) {
-      $create = $this->saveMenu($_POST);
+      // Create a menu
+      $create = CustomMenuData::saveMenu($_POST);
       if ($create) $msg = array('status' => 'updated', 'msg' => i18n_r(self::FILE.'/MENU_CREATE_SUCCESS'));
       else         $msg = array('status' => 'error', 'msg' => i18n_r(self::FILE.'/MENU_CREATE_ERROR'));
-    }
-    elseif (!empty($_POST['saveMenu'])) {
-      $save = $this->saveMenu($_POST);
+    } elseif (!empty($_POST['saveMenu'])) {
+      // Update a menu
+      $save = CustomMenuData::saveMenu($_POST);
       if ($save) $msg = array('status' => 'updated', 'msg' => str_replace('%s', '<b>'.$_POST['name'].'</b>', i18n_r(self::FILE.'/MENU_UPDATE_SUCCESS')));
       else       $msg = array('status' => 'error', 'msg' => i18n_r(self::FILE.'/MENU_UPDATE_ERROR'));
-    }
-    elseif (!empty($_GET['delete'])) {
+    } elseif (!empty($_GET['delete'])) {
+      // Delete a menu
       $file = GSDATAOTHERPATH.self::FILE.'/'.$_GET['delete'].'.xml';
       if (file_exists($file)) {
         $delete = unlink($file);
@@ -221,28 +241,6 @@ class CustomMenu {
       }
     }
 
-    // error message
-    if ($msg) {
-      ?>
-      <script>
-        $(document).ready(function() {
-          $('div.bodycontent').before('<div class="' + <?php echo json_encode($msg['status']); ?> + '" style="display:block;">'+<?php echo json_encode($msg['msg']); ?>+'</div>');
-        }); // ready
-      </script>
-      <?php
-    }
-
-    // create new menu
-    if (isset($_GET['create'])) {
-      include($path.'menu.php');
-    }
-    // edit a menu
-    elseif (isset($_GET['menu'])) {
-      include($path.'menu.php');
-    }
-    // menus
-    else {
-      include($path.'menus.php');
-    }
+    return $msg;
   }
 }
