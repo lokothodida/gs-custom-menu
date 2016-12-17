@@ -13,12 +13,12 @@ class CustomMenuDisplay {
   private $classes = array();
 
   public function __construct($menu, $classes = array()) {
-    $classes = array_merge($classes, array(
+    $classes = array_merge(array(
       'currentpath' => 'currentpath',
       'current'     => 'current',
       'parent'      => 'parent',
       'child'       => 'child'
-    ));
+    ), $classes);
 
     $this->classes = $classes;
     $this->menu = CustomMenuData::getMenu($menu);

@@ -135,14 +135,14 @@ class CustomMenu {
 
   static public function getMenuItemTemplate($item = array(), $mode = true) {
     // Default data for item
-    $item = array_merge($item, array(
+    $item = array_merge(array(
       'title'  => '',
       'url'    => '',
       'slug'   => '',
       'level'  => 0,
       'target' => '_self',
       'img'    => null,
-    ));
+    ), $item);
 
     // prevents array to string conversion problem
     foreach ($item as $node => $val) {

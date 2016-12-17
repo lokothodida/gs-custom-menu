@@ -2,6 +2,7 @@
 
 /*
   Handles data queries (getting and saving) for menus
+  uses CustomMenu
   */
 class CustomMenuData {
   // Constants

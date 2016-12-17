@@ -12,6 +12,9 @@ jQuery(function($) {
   var $page     = $document.find("#custom-menu-admin");
   var $form     = $page.find("form");
   var $items    = $page.find(".items");
+  var i18n      = {
+    ARE_YOU_SURE: <?php echo json_encode(CustomMenu::i18n_r('ARE_YOU_SURE')) ?>,
+  };
 
   // Encapsulate item traversal logic in a class
   // This will be assigned to the "data" attribute of the given elem
@@ -103,6 +106,14 @@ jQuery(function($) {
     evt.preventDefault();
   }
 
+  function saveMenuConfirmationCallback(evt) {
+    var choice = confirm(i18n.ARE_YOU_SURE);
+
+    if (!choice) {
+      evt.preventDefault();
+    }
+  }
+
   function openItemSettingsCallback(evt) {
     var $item = Item.closest(evt.target);
     var item  = $item.data("item");
@@ -166,6 +177,9 @@ jQuery(function($) {
     // Remove an item from the items list
     $form.on("click", ".delete", deleteItemCallback);
 
+    // Confirmation before deleting a menu
+    $form.on("click", ".submit", saveMenuConfirmationCallback);
+
     // Open the advanced settings for an item
     $form.on("click", ".open", openItemSettingsCallback);
 
@@ -180,6 +194,7 @@ jQuery(function($) {
 
     // Force all of the empty slug dropdowns to be hidden
     $form.find(".slugDropdown").trigger("change");
+
   }
 
   init();
@@ -219,7 +234,7 @@ jQuery(function($) {
   </div>
 
   <div style="margin-top: 10px;">
-    <input type="submit" class="submit" <?php echo (isset($_GET['menu'])) ? 'name="saveMenu"' : 'name="createMenu"'; ?> value="<?php i18n('BTN_SAVECHANGES'); ?>" onclick="return confirm('<?php CustomMenu::i18n('ARE_YOU_SURE'); ?>');">&nbsp;&nbsp;/
+    <input type="submit" class="submit" <?php echo (isset($_GET['menu'])) ? 'name="saveMenu"' : 'name="createMenu"'; ?> value="<?php i18n('BTN_SAVECHANGES'); ?>">&nbsp;&nbsp;/
     <a href="<?php echo $url; ?>" class="cancel"><?php CustomMenu::i18n('BACK'); ?></a>
   </div>
 </form>
