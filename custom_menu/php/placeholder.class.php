@@ -11,10 +11,9 @@ class CustomMenuPlaceholder {
     // Get the parameters
     $params = self::parseParameters($matches[1]);
 
-    ob_start();
-      $menu = new CustomMenuDisplay($params[0]);
-      $output = '<ul class="'. CustomMenu::FILE . ' ' . $params[0] . '">' . ob_get_contents() . '</ul>';
-    ob_end_clean();
+    // Get the menu and wrap it in an unordered list
+    $menu = new CustomMenuDisplay($params[0]);
+    $output = '<ul class="'. CustomMenu::FILE . ' ' . $params[0] . '">' . $menu->getMenu(). '</ul>';
 
     return $output;
   }

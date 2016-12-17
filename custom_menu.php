@@ -38,8 +38,9 @@
     add_filter('content', array($custommenu, 'content'));
 
 # functions
-  function get_custom_menu($name, $classes=array()) {
+  function get_custom_menu($name, $classes = array()) {
     $menu = new CustomMenuDisplay($name, $classes);
+    $menu->displayMenu();
   }
 
 ?>

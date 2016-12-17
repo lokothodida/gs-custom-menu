@@ -19,7 +19,6 @@ class CustomMenuDisplay {
     $this->classes = $classes;
     $this->menu = $custommenu->getItems($menu);
     $this->parse();
-    $this->displayMenu();
   }
 
   # get the full current url (http://www.phpro.org/examples/Get-Full-URL.html)
@@ -187,11 +186,24 @@ class CustomMenuDisplay {
 
   # final output
   public function displayMenu() {
+    echo $this->getMenu();
+  }
+
+  # get output
+  public function getMenu() {
+    // Buffer all of the output
+    ob_start();
+
     $this->url = $this->url();
     if (is_array($this->parents)) {
       foreach ($this->parents as $parent) {
         $this->displayItem($parent);
       }
     }
+
+    $content = ob_get_contents();
+    ob_end_clean();
+
+    return $content;
   }
 }
