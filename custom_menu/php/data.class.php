@@ -4,6 +4,10 @@
   Handles data queries (getting and saving) for menus
   */
 class CustomMenuData {
+  // Constants
+  const EXT = '.xml';
+
+  // Methods
   # string to slug (by Gilbert Pellegrom)
   static protected function strtoslug($string) {
     return strtolower(trim(preg_replace('/[^A-Za-z0-9-_]+/', '-', self::transliterate($string))));
@@ -37,13 +41,13 @@ class CustomMenuData {
     }
 
     // files
-    if (!file_exists(GSDATAOTHERPATH . CustomMenu::FILE .'/default.xml')) {
+    if (!self::menuExists('default')) {
       self::saveMenu(array(
-        'name' => 'default',
-        'level' => array(0),
-        'slug' => array('index'),
-        'title' => array('Home'),
-        'url' => array('/'),
+        'name'   => 'default',
+        'level'  => array(0),
+        'slug'   => array('index'),
+        'title'  => array('Home'),
+        'url'    => array('/'),
         'target' => array('_self'),
       ));
     }
@@ -52,7 +56,7 @@ class CustomMenuData {
   }
 
   static public function getMenu($menu) {
-    $file = GSDATAOTHERPATH . CustomMenu::FILE . '/' . $menu . '.xml';
+    $file = self::getMenuFilename($menu);
 
     if (file_exists($file)) {
       $items = simplexml_load_file($file, 'SimpleXMLElement', LIBXML_NOCDATA); // thanks to http://blog.evandavey.com/2008/04/how-to-fix-simplexml-cdata-problem-in-php.html
@@ -79,11 +83,11 @@ class CustomMenuData {
   }
 
   static public function listMenus() {
-    $files = glob(GSDATAOTHERPATH . CustomMenu::FILE . '/*.xml');
+    $files = glob(self::getMenuFilename('*'));
     $slugs = array();
 
     foreach ($files as $file) {
-      $slugs[] = basename($file, '.xml');
+      $slugs[] = basename($file, self::EXT);
     }
 
     return $slugs;
@@ -121,13 +125,6 @@ class CustomMenuData {
       $return[$key]['slug'] = self::strtoslug($return[$key]['slug']);
       $return[$key]['url'] =  self::transliterate($return[$key]['url']);
 
-      // checks to see slug doesn't already exist
-      /*
-      if (in_array($return[$key]['slug'], $saved)) {
-        $return[$key]['slug'] = $return[$key]['slug'].'-'.rand(0, 100);
-      }
-      */
-
       // add to saved array
       $saved[] = $return[$key]['slug'];
     }
@@ -159,11 +156,10 @@ class CustomMenuData {
 
     // save to file
     $post['name'] = self::strtoslug($post['name']);
-    $datapath = GSDATAOTHERPATH. CustomMenu::FILE;
-    $newfile = $datapath . '/'.$post['name'] . '.xml';
+    $newfile = self::getMenuFilename($post['name']);
 
     if (isset($post['oldname'])) {
-      $oldfile = $datapath . '/' . $post['oldname'] . '.xml';
+      $oldfile = self::getMenuFilename($post['oldname']);
       if (file_exists($oldfile) && !file_exists($newfile)) {
         unlink($oldfile);
       }
@@ -184,6 +180,6 @@ class CustomMenuData {
   }
 
   static public function getMenuFilename($slug) {
-    return GSDATAOTHERPATH . CustomMenu::FILE . '/' . $slug . '.xml';
+    return GSDATAOTHERPATH . CustomMenu::FILE . '/' . $slug . self::EXT;
   }
 }
