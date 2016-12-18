@@ -237,7 +237,6 @@ jQuery(function($) {
 
     // Force all of the empty slug dropdowns to be hidden
     $form.find(".slugDropdown").trigger("change");
-
   }
 
   init();

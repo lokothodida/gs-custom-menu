@@ -9,12 +9,12 @@ class CustomMenuData {
   const EXT = '.xml';
 
   // Methods
-  # string to slug (by Gilbert Pellegrom)
+  // string to slug (by Gilbert Pellegrom)
   static protected function strtoslug($string) {
     return strtolower(trim(preg_replace('/[^A-Za-z0-9-_]+/', '-', self::transliterate($string))));
   }
 
-  # transliteration
+  // transliteration
   static protected function transliterate($string) {
     global $i18n;
     if (isset($i18n['TRANSLITERATION']) && is_array($translit = $i18n['TRANSLITERATION']) && count($translit > 0)) {
@@ -23,6 +23,7 @@ class CustomMenuData {
     return $string;
   }
 
+  // Data initialization (creating folders)
   static public function init() {
     $return = array();
     $paths  = array(CustomMenu::FILE);
@@ -83,6 +84,7 @@ class CustomMenuData {
     else return array();
   }
 
+  // Get the slugs of all the menus
   static public function listMenus() {
     $files = glob(self::getMenuFilename('*'));
     $slugs = array();
@@ -94,6 +96,7 @@ class CustomMenuData {
     return $slugs;
   }
 
+  // Get all of the menu items
   static public function getMenus() {
     $slugs = self::listMenus();
     $menus = array();
@@ -105,6 +108,7 @@ class CustomMenuData {
     return $menus;
   }
 
+  // Save a menu
   static public function saveMenu($post) {
     // initialization
     $return = $nodes = $saved = array();
@@ -169,6 +173,7 @@ class CustomMenuData {
     return $dom->save($newfile);
   }
 
+  // Delete a menu
   static public function deleteMenu($slug) {
     // Delete a menu
     $file = self::getMenuFilename($slug);
@@ -176,10 +181,12 @@ class CustomMenuData {
     return file_exists($file) && (bool) unlink($file);
   }
 
+  // Check that a menu exists
   static public function menuExists($slug) {
     return file_exists(self::getMenuFilename($slug));
   }
 
+  // Get canonical filename for a menu
   static public function getMenuFilename($slug) {
     return GSDATAOTHERPATH . CustomMenu::FILE . '/' . $slug . self::EXT;
   }
