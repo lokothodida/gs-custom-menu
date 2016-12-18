@@ -1,23 +1,5 @@
 <h3><?php CustomMenu::i18n('PLUGIN_NAME'); ?></h3>
 
-<style>
-  input.create { display: none; }
-</style>
-
-<script>
-/* global jQuery */
-jQuery(function($) {
-  // Force the input button to be an anchor to the creation page
-  $('a.create').hide();
-  $('input.create').show();
-  $('input.create').click(function(evt) {
-    window.location.href = $('a.create').attr('href');
-
-    evt.preventDefault();
-  });
-});
-</script>
-
 <table class="highlight edittable">
   <thead>
     <tr>
@@ -51,3 +33,21 @@ jQuery(function($) {
 
 <a href="<?php echo $url; ?>&create" class="create"><?php CustomMenu::i18n('CREATE'); ?></a>
 <input type="submit" class="submit create" value="<?php CustomMenu::i18n('CREATE'); ?>">
+
+<style>
+  input.create { display: none; }
+</style>
+
+<script>
+/* global jQuery */
+jQuery(function($) {
+  // Force the input button to be an anchor to the creation page
+  $('a.create').hide();
+  $('input.create').show();
+  $('input.create').click(function(evt) {
+    window.location.href = $('a.create').attr('href');
+
+    evt.preventDefault();
+  });
+});
+</script>

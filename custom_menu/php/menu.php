@@ -1,4 +1,49 @@
+<?php
+// Set up variables
+$menu       = (isset($_GET['menu'])) ? $_GET['menu'] : null;
+$buttonType = $menu ? 'saveMenu' : 'createMenu';
+?>
+
 <h3><?php CustomMenu::i18n('MENU'); ?></h3>
+
+<section id="custom-menu-admin">
+
+<template name="admin-menu-item">
+  <?php CustomMenu::getMenuItemTemplate(); ?>
+</template>
+
+<form method="post" action="<?php echo $url; ?>">
+  <div>
+    <p>
+      <input type="hidden" name="oldname" value="<?php echo $menu; ?>">
+      <input type="text" class="text" style="width: 150px;" name="name" placeholder="<?php CustomMenu::i18n('NAME'); ?>" required value="<?php if (isset($_GET['menu'])) echo $_GET['menu']; ?>">
+      <a href="#" class="cancel add">+ <?php CustomMenu::i18n('ITEM'); ?></a>
+    </p>
+    <div class="items">
+      <?php
+        $items = !empty($menu) ? CustomMenuData::getMenu($menu) : array();
+
+        foreach ($items as $item) {
+          CustomMenu::getMenuItemTemplate($item);
+        }
+
+        if (empty($items)) {
+          // Show an empty item by default
+          CustomMenu::getMenuItemTemplate();
+        }
+      ?>
+    </div>
+    <p>
+      <a href="#" class="cancel add">+ <?php CustomMenu::i18n('ITEM'); ?></a>
+    </p>
+  </div>
+
+  <div style="margin-top: 10px;">
+    <input type="submit" class="submit" name="<?php echo $buttonType; ?>" value="<?php i18n('BTN_SAVECHANGES'); ?>">&nbsp;&nbsp;/
+    <a href="<?php echo $url; ?>" class="cancel"><?php CustomMenu::i18n('BACK'); ?></a>
+  </div>
+</form>
+</section>
 
 <style>
   .advanced { display: none; }
@@ -200,48 +245,3 @@ jQuery(function($) {
   init();
 });
 </script>
-
-<?php
-// Set up variables
-$menu = (isset($_GET['menu'])) ? $_GET['menu'] : null;
-$buttonType = $menu ? 'saveMenu' : 'createMenu';
-?>
-
-<section id="custom-menu-admin">
-
-<template name="admin-menu-item">
-  <?php CustomMenu::getMenuItemTemplate(); ?>
-</template>
-
-<form method="post" action="<?php echo $url; ?>">
-  <div>
-    <p>
-      <input type="hidden" name="oldname" value="<?php echo $menu; ?>">
-      <input type="text" class="text" style="width: 150px;" name="name" placeholder="<?php CustomMenu::i18n('NAME'); ?>" required value="<?php if (isset($_GET['menu'])) echo $_GET['menu']; ?>">
-      <a href="#" class="cancel add">+ <?php CustomMenu::i18n('ITEM'); ?></a>
-    </p>
-    <div class="items">
-      <?php
-        $items = !empty($menu) ? CustomMenuData::getMenu($menu) : array();
-
-        foreach ($items as $item) {
-          CustomMenu::getMenuItemTemplate($item);
-        }
-
-        if (empty($items)) {
-          // Show an empty item by default
-          CustomMenu::getMenuItemTemplate();
-        }
-      ?>
-    </div>
-    <p>
-      <a href="#" class="cancel add">+ <?php CustomMenu::i18n('ITEM'); ?></a>
-    </p>
-  </div>
-
-  <div style="margin-top: 10px;">
-    <input type="submit" class="submit" name="<?php echo $buttonType; ?>" value="<?php i18n('BTN_SAVECHANGES'); ?>">&nbsp;&nbsp;/
-    <a href="<?php echo $url; ?>" class="cancel"><?php CustomMenu::i18n('BACK'); ?></a>
-  </div>
-</form>
-</section>
