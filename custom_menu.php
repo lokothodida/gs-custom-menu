@@ -27,22 +27,15 @@ register_plugin(
 
 // Activate actions/filters
 // front-end
-  // Theme header
-  add_action('theme-header', 'CustomMenu::themeHeader');
-
   // Placeholder content filter
   add_filter('content', 'CustomMenuPlaceholder::filter');
 
 // back-end
-  if (isset($_GET['id']) && $_GET['id'] == CustomMenu::FILE) {
-    // Admin header
-    add_action('header', 'CustomMenu::header');
-  }
-
   // Plugin sidebar
   add_action(CustomMenu::PAGE . '-sidebar', 'createSideMenu' , array(CustomMenu::FILE, CustomMenu::i18n_r('PLUGIN_SIDEBAR'))); // sidebar link
 
-// functions
+// Public functions
+// Print a custom menu
 function get_custom_menu($name, $classes = array()) {
   $menu = new CustomMenuDisplay($name, $classes);
   $menu->displayMenu();

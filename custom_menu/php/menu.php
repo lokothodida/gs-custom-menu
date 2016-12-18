@@ -57,9 +57,7 @@ jQuery(function($) {
   var $page     = $document.find("#custom-menu-admin");
   var $form     = $page.find("form");
   var $items    = $page.find(".items");
-  var i18n      = {
-    ARE_YOU_SURE: <?php echo json_encode(CustomMenu::i18n_r('ARE_YOU_SURE')) ?>,
-  };
+  var i18n      = <?php CustomMenu::getI18nHashes(); ?>;
 
   // Encapsulate item traversal logic in a class
   // This will be assigned to the "data" attribute of the given elem

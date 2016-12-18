@@ -13,20 +13,40 @@ class CustomMenu {
   const PAGE    = 'pages';
 
   /* methods */
+  // Return i18n hash
   static public function i18n_r($hash) {
     return i18n_r(self::FILE . '/' . $hash);
   }
 
+  // Print i18n hash
   static public function i18n($hash) {
     echo self::i18n_r($hash);
   }
 
-  # string to slug (by Gilbert Pellegrom)
+  // Return all custom i18n hashes
+  static public function returnI18nHashes() {
+    include(GSPLUGINPATH . self::FILE . '/lang/en_US.php');
+
+    $hashes = array();
+
+    foreach ($i18n as $hash => $string) {
+      $hashes[$hash] = self::i18n_r($hash);
+    }
+
+    return $hashes;
+  }
+
+  // Print all custom i18n hashes (used for client-side i18n)
+  static public function getI18nHashes() {
+    echo json_encode(self::returnI18nHashes());
+  }
+
+  // string to slug (by Gilbert Pellegrom)
   static public function strtoslug($string) {
     return strtolower(trim(preg_replace('/[^A-Za-z0-9-_]+/', '-', self::transliterate($string))));
   }
 
-  # transliteration
+  // string transliteration
   static public function transliterate($string) {
     global $i18n;
     if (isset($i18n['TRANSLITERATION']) && is_array($translit = $i18n['TRANSLITERATION']) && count($translit > 0)) {
@@ -35,35 +55,7 @@ class CustomMenu {
     return $string;
   }
 
-  # load items from menu (as array)
-  public function getItems($menu) {
-    return CustomMenuData::getMenu($menu);
-  }
-
-  # get menus
-  public function getMenus() {
-    return CustomMenuData::getMenus();
-  }
-
-  # placeholder evaluator
-  public function content($content) {
-    return CustomMenuPlaceholder::filter($content);
-  }
-
-  # header (for codemirror)
-  static public function header() {
-    global $SITEURL;
-    echo '<link href="'.$SITEURL.'admin/template/js/codemirror/lib/codemirror.css?v=screen" rel="stylesheet" media=""><link href="'.$SITEURL.'admin/template/js/codemirror/theme/default.css?v=screen" rel="stylesheet" media="">';
-    echo '<script src="'.$SITEURL.'admin/template/js/fancybox/jquery.fancybox.pack.js?v=2.0.4"></script><script src="'.$SITEURL.'admin/template/js/codemirror/lib/codemirror-compressed.js?v=0.2.0"></script>';
-  }
-
-  # theme header
-  static public function themeHeader() {
-    global $SITEURL;
-    echo '<base href="'.$SITEURL.'">';
-  }
-
-  # admin
+  // admin panel
   static public function admin() {
     global $SITEURL;
     $init = CustomMenuData::init();
@@ -75,14 +67,7 @@ class CustomMenu {
 
     // Some JavaScript for displaying the error message
     if ($msg) {
-      ?>
-      <script>
-        jQuery(function($) {
-          var msg = <?php echo json_encode($msg); ?>;
-          $('div.bodycontent').before('<div class="' + msg.status + '" style="display:block;">' + msg.msg + '</div>');
-        });
-      </script>
-      <?php
+      include($path . 'status.php');
     }
 
     // Display the correct page
@@ -93,7 +78,7 @@ class CustomMenu {
       // Edit a menu
       include($path . 'menu.php');
     } else {
-      // Show menus
+      // Show all menus
       include($path . 'menus.php');
     }
   }
