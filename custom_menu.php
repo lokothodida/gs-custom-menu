@@ -1,38 +1,43 @@
 <?php
-/* Custom Menu */
+/* Custom Menu Plugin */
 
-// Plugin ID
-$thisfile = basename(__FILE__, '.php');
+// Registration
+register_plugin_custom_menu();
 
-// language
-i18n_merge($thisfile) || i18n_merge($thisfile, 'en_US');
+function register_plugin_custom_menu() {
+  // Plugin ID
+  $thisfile = basename(__FILE__, '.php');
 
-// requires
-require_once(GSPLUGINPATH . $thisfile . '/php/plugin.class.php');
-require_once(GSPLUGINPATH . $thisfile . '/php/data.class.php');
-require_once(GSPLUGINPATH . $thisfile . '/php/display.class.php');
-require_once(GSPLUGINPATH . $thisfile . '/php/placeholder.class.php');
+  // language
+  i18n_merge($thisfile) || i18n_merge($thisfile, 'en_US');
 
-// Register plugin
-register_plugin(
-  CustomMenu::FILE,
-  CustomMenu::i18n_r('PLUGIN_NAME'),
-  CustomMenu::VERSION,
-  CustomMenu::AUTHOR,
-  CustomMenu::URL,
-  CustomMenu::i18n_r('PLUGIN_DESC'),
-  CustomMenu::PAGE,
-  'CustomMenu::admin'
-);
+  // requires
+  require_once(GSPLUGINPATH . $thisfile . '/php/plugin.class.php');
+  require_once(GSPLUGINPATH . $thisfile . '/php/data.class.php');
+  require_once(GSPLUGINPATH . $thisfile . '/php/display.class.php');
+  require_once(GSPLUGINPATH . $thisfile . '/php/placeholder.class.php');
 
-// Activate actions/filters
-// front-end
-  // Placeholder content filter
-  add_filter('content', 'CustomMenuPlaceholder::filter');
+  // Register plugin
+  register_plugin(
+    CustomMenu::FILE,
+    CustomMenu::i18n_r('PLUGIN_NAME'),
+    CustomMenu::VERSION,
+    CustomMenu::AUTHOR,
+    CustomMenu::URL,
+    CustomMenu::i18n_r('PLUGIN_DESC'),
+    CustomMenu::PAGE,
+    'CustomMenu::admin'
+  );
 
-// back-end
-  // Plugin sidebar
-  add_action(CustomMenu::PAGE . '-sidebar', 'createSideMenu' , array(CustomMenu::FILE, CustomMenu::i18n_r('PLUGIN_SIDEBAR'))); // sidebar link
+  // Activate actions/filters
+  // front-end
+    // Placeholder content filter
+    add_filter('content', 'CustomMenuPlaceholder::filter');
+
+  // back-end
+    // Plugin sidebar
+    add_action(CustomMenu::PAGE . '-sidebar', 'createSideMenu' , array(CustomMenu::FILE, CustomMenu::i18n_r('PLUGIN_SIDEBAR'))); // sidebar link
+}
 
 // Public functions
 // Print a custom menu
