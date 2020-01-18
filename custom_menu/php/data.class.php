@@ -17,7 +17,7 @@ class CustomMenuData {
   // transliteration
   static protected function transliterate($string) {
     global $i18n;
-    if (isset($i18n['TRANSLITERATION']) && is_array($translit = $i18n['TRANSLITERATION']) && count($translit > 0)) {
+    if (isset($i18n['TRANSLITERATION']) && is_array($translit = $i18n['TRANSLITERATION']) && count($translit) > 0) {
       $string =  str_replace(array_keys($translit), array_values($translit), $string);
     }
     return $string;
